@@ -2,10 +2,13 @@
   "name": "raphatarso",
   "version": "0.1.0",
   "private": true,
-  "description": "Esqueleto para pôr um agente a operar em produção sem perder a confiança de quem opera. Domínio ainda não ancorado (Fase 01).",
+  "description": "Motor de otimização de tráfego para Meta Ads que decide por venda PAGA, propõe e só executa com OK humano.",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "auditoria": "node scripts/auditoria.js"
+    "auditoria": "node scripts/auditoria.js",
+    "mutacao": "node scripts/mutacao.js"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

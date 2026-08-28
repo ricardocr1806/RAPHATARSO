@@ -8,9 +8,10 @@ operação agora).
 
 1. **Verdade.** A fonte da verdade é o registro que ninguém tem interesse em
    inflar. Divergência se RESOLVE; nunca se tira média nem se arredonda.
-2. **Doutrina em código.** Toda regra vira função pura e testada em
-   `src/doutrina.js`, com o episódio que a gerou no comentário. Limiares em
-   `config.json`, nunca no meio da lógica.
+2. **Doutrina em código.** Regra de decisão vira dado em `src/regras.js` (o
+   motor consulta, nunca há `if` de decisão solto); regra portável vira função
+   pura em `src/doutrina.js`. Sempre com o episódio no comentário e o limiar em
+   `config.json`.
 3. **Propor, não executar.** Proponha e espere OK. Execução automática só para
    os gatilhos listados em `config.propostas.gatilhosComExecucaoAutomatica`, e
    nunca para nada que gaste.
@@ -36,13 +37,23 @@ operação agora).
 - Consulta em lote sempre por `emBlocos`; escrita em massa sempre com orçamento.
 - Conclusão só se marca com tudo processado (`marcarConclusao`).
 - Dois estados diferentes nunca compartilham nome.
+- Venda é o CHECKOUT, nunca o pedido. Denominador de custo é só o FRONT.
+- O dia corrente não decide: 42% dos checkouts dele ainda estão pendentes.
+- Escrita na Meta passa por `src/meta/escrita.js` — read-back no mesmo campo, e
+  rate limit na leitura NUNCA vira reescrita.
+- `LIKE` é proibido onde a caixa importa: use `GLOB` (`src/sql.js`).
 
 ## Comandos
 
 ```
-npm test           # 38 testes, sem dependências externas
+npm test           # 111 testes, sem dependências externas
+npm run mutacao    # reintroduz 15 defeitos reais; todos precisam ficar VERMELHOS
 npm run auditoria  # audita o próprio repositório; grava .auditoria/ultima.json
 ```
+
+Regra nova em `src/regras.js` ou `src/doutrina.js` entra com teste E com
+mutação: se `npm run mutacao` não fica vermelho ao quebrá-la, o teste não prova
+nada.
 
 ## Mensagem de commit
 
@@ -51,8 +62,8 @@ que custou caro, a mensagem cita o número e a armadilha correspondente.
 
 ## O que NÃO fazer
 
-- Não escrever regra de domínio antes da Fase 01 estar fechada
-  (`docs/FASES.md`). Enquanto `config.verdade.fonte` for placeholder, nenhum
-  número deste sistema decide nada.
+- Não propor com número que não foi conferido contra o dado bruto. As duas
+  conferências pendentes estão em `ESTADO.md` e a auditoria as acusa.
+- Não criar campanha ATIVA. Campanha nasce PAUSADA, sempre.
 - Não ligar gatilho automático antes de existir a medição que o justifique.
 - Não transformar `ESTADO.md` em diário.

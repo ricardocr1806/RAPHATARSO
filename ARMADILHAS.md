@@ -1,11 +1,7 @@
 # Armadilhas, com o preço de cada uma
 
-Erro sem número vira folclore e alguém repete. Toda armadilha aqui carrega o
-que custou.
-
-As 19 abaixo vieram de outro domínio (um agente de tráfego que operava verba
-real) e são **portáveis**: nenhuma delas é sobre anúncios. Chegaram prontas,
-com o preço já pago lá. As próximas vêm daqui.
+Erro sem número vira folclore e alguém repete. Toda armadilha aqui carrega o que
+custou.
 
 **Formato obrigatório de uma armadilha nova**, quatro campos e um título:
 
@@ -17,6 +13,10 @@ com o preço já pago lá. As próximas vêm daqui.
 
 O objetivo declarado: que esta lista pare de crescer por descoberta e passe a
 crescer por antecipação.
+
+`npm run mutacao` reintroduz 15 destes defeitos, um por vez, e exige que a suíte
+fique VERMELHA. Armadilha cuja mutação passa verde não tem trava — tem só um
+parágrafo.
 
 ---
 
@@ -143,3 +143,137 @@ crescer por antecipação.
 **Sintoma:** "não consigo ver".
 **Causa:** link é entrega; se não abre para o destinatário, não foi entregue.
 **Trava:** sem trava automática ainda — conferir o campo de link público na fonte antes de enviar.
+
+## Meta / Graph API
+
+### Pedir um campo que aquele nível não aceita
+**Preço:** a requisição inteira recusada, não só o campo — a carga de gasto volta vazia e a tela lê "não gastou".
+**Sintoma:** insights sumindo de um nível só.
+**Causa:** `campaign_id` no nível de campanha; e `clicks` no lugar de `inline_link_clicks` infla o CTR com curtida e comentário.
+**Trava:** `src/meta/campos.js#camposPara` (recusa o campo antes da Meta) e `#degradar` (tenta com menos campos em vez de desistir).
+
+### `url_tags` enviado no anúncio
+**Preço:** UTM ausente em toda a campanha — e com ela a ligação entre clique e venda.
+**Sintoma:** `{"success":true}` e nada muda.
+**Causa:** `url_tags` é campo do CRIATIVO. A Meta responde sucesso e ignora.
+**Trava:** `src/meta/escrita.js#validarCriacao` + read-back no mesmo campo.
+
+### `start_time` editado depois da criação
+**Preço:** conjunto começa na hora em que nasceu, mesmo pausado — e o agendamento não acontece.
+**Sintoma:** entrega começando fora da hora combinada.
+**Causa:** a Meta só edita a hora de quem ainda não começou.
+**Trava:** `validarCriacao` exige `start_time` na criação quando há agendamento.
+
+### Criar campanha CBO com dois orçamentos
+**Preço:** criação inteira derrubada, não só o campo.
+**Sintoma:** erro genérico de validação.
+**Causa:** orçamento diário junto com vitalício; e flags de criativo descontinuado copiadas de campanha antiga.
+**Trava:** `validarCriacao`.
+
+### Campanha nascendo ATIVA
+**Preço:** seis campanhas de R$ 1.500/dia criadas por um deploy em propagação que ninguém pediu. Nasceram PAUSADAS — gasto zero. Ativas seriam R$ 9.000/dia.
+**Sintoma:** nenhum, porque a trava segurou.
+**Causa:** deploy em propagação servindo duas versões ao mesmo tempo.
+**Trava:** `validarCriacao` recusa `status !== 'PAUSED'`.
+
+### Rate limit na LEITURA lido como falha da escrita
+**Preço:** objeto duplicado a cada reescrita — dinheiro entrando em campanha que ninguém criou de propósito.
+**Sintoma:** `17: User request limit reached` logo depois de uma escrita que passou.
+**Causa:** a mensagem parece dizer que nada aconteceu.
+**Trava:** `src/meta/escrita.js#aplicarNaMeta` devolve `escrito_sem_conferir` e manda RELER — nunca reescrever.
+
+### Ação de escrita atrás de um GET
+**Preço:** cada prefetch de navegador e cada varredura de antivírus corporativo executa a ação. É dinheiro mudando de lugar sozinho.
+**Sintoma:** ações "que ninguém clicou".
+**Causa:** link é GET, e GET é clicado por robô.
+**Trava:** `exigirPost`.
+
+## Medição e comparação
+
+### Comparar braços com tráfego de anúncios diferentes
+**Preço:** uma variante "ganhava" de 66,7% a 39,1%; com tráfego do mesmo anúncio, 64,9% contra 52,0% — e as margens se cobriam. A decisão teria matado a variante certa.
+**Sintoma:** teste A/B com resultado forte demais.
+**Causa:** público de campanhas diferentes chamado de braço.
+**Trava:** `src/funil.js#filtrarPorAnuncio` (exige `ad_id`) e `#compararBracos`.
+
+### Ordenar por taxa com amostra pequena
+**Preço:** 33% contra 29% com 20 pessoas por braço é sorteio — e a lista ordenada convida a matar o segundo colocado.
+**Sintoma:** vencedores que trocam de lugar toda semana.
+**Causa:** taxa sem intervalo de confiança.
+**Trava:** `intervaloWilson` + veredito `empate_tecnico` escrito na tela.
+
+### Medir a queda do funil contra a base
+**Preço:** a tela culpada some no meio; toda tela do fim parece igualmente ruim. A queda real está no primeiro clique — de 32% a 85% da capa para a primeira pergunta, contra 0% a 4% por tela nas 40 seguintes.
+**Sintoma:** otimização de tela do meio, onde não há perda.
+**Causa:** denominador errado.
+**Trava:** `quedaContraAnterior`.
+
+### Bandit decidindo com três cliques
+**Preço:** o braço vencedor eleito antes de existir amostra; o outro morre sem chance.
+**Sintoma:** convergência instantânea.
+**Causa:** Thompson Sampling sem aquecimento.
+**Trava:** `src/bandit.js#escolherBraco` divide igual até 50 cliques por braço.
+
+### Normalizar as fatias depois de aplicar o teto
+**Preço:** ainda não custou — foi pego pelo teste antes de subir. O teto de 80% virava 94% numa disputa de dois braços.
+**Sintoma:** o vencedor levando mais do que o teto declarado na tela.
+**Causa:** normalizar depois de cortar desfaz o corte.
+**Trava:** `fatiasComPisoETeto` fixa um tipo de violação por volta e redistribui o resto.
+
+### `utm_campaign` usado para juntar campanha
+**Preço:** junção silenciosamente errada — a etiqueta expandida da Meta chega mutilada no meio.
+**Sintoma:** gasto sem campanha correspondente.
+**Causa:** a UTM do clique vem cortada; o NOME vem inteiro pela API.
+**Trava:** `spend.objeto_nome` no schema; junção por nome, nunca por UTM.
+
+### Filtrar clique suspeito por país
+**Preço:** cada clique de verdade recusado apaga a venda que ele traria. A automação de revisão da Meta chega dos EUA, com fbclid, em rajadas de 19 num minuto — e é indistinguível de um comprador viajando.
+**Sintoma:** vendas sem clique de origem.
+**Causa:** confundir "suspeito" com "robô".
+**Trava:** `classificarClique` filtra user-agent conhecido e apenas MARCA o resto.
+
+## Navegador
+
+### Aviso enviado depois de um `await`
+**Preço:** 14 leads gravados, 2 conversões registradas — 4 de cada 5 perdidas.
+**Sintoma:** conversão muito menor que lead, sem erro no console.
+**Causa:** a função não é aguardada e a linha seguinte é `location.href = ...`; o documento descarrega enquanto o await está em pé.
+**Trava:** sem trava automática — `sendBeacon` com `text/plain` disparado ANTES de qualquer await (o preflight de `application/json` não é coberto por `keepalive`).
+
+### Dois arquivos clássicos com o mesmo `const`
+**Preço:** `SyntaxError` e NENHUM dos dois executa — a página inteira para.
+**Sintoma:** tela em branco sem erro visível na aplicação.
+**Causa:** script clássico divide escopo global.
+**Trava:** código de página dentro de IIFE.
+
+### `querySelector("#x").metodo()` sem `?.`
+**Preço:** o que vem DEPOIS da linha que estourou não roda — e o sintoma aparece longe da causa.
+**Sintoma:** metade da tela funcionando.
+**Causa:** elemento removido em outra mudança.
+**Trava:** encadeamento opcional em todo acesso a elemento.
+
+## Processo e infraestrutura
+
+### Worker chamando a URL pública de outro Worker da mesma conta
+**Preço:** tela vazia dizendo "não consegui ler", com as duas pontas funcionando — horas de depuração no lugar errado.
+**Sintoma:** 404 de um serviço que está no ar.
+**Causa:** a requisição volta para o próprio chamador.
+**Trava:** service binding (Worker→Worker interno), nunca URL pública.
+
+### Deploy em propagação
+**Preço:** seis campanhas de R$ 1.500/dia criadas por duas versões servindo ao mesmo tempo.
+**Sintoma:** ação executada duas vezes, ou contra código velho.
+**Causa:** propagação não é atômica.
+**Trava:** ação que CRIA objeto não roda contra serviço recém-deployado; e campanha nasce pausada.
+
+### Duas pessoas deployando o mesmo serviço de branches diferentes
+**Preço:** o deploy de uma apaga o da outra — e o código no ar deixa de existir em qualquer branch.
+**Sintoma:** regra que "voltou".
+**Causa:** deploy sobrescreve, não faz merge.
+**Trava:** `git pull` antes de subir; e `verificarVersaoNoAr` para saber o que está rodando.
+
+### Segredo no repositório
+**Preço:** o histórico do git guarda para sempre, inclusive em repositório privado — a rotação do token vira a única saída.
+**Sintoma:** nenhum, até vazar.
+**Causa:** conveniência.
+**Trava:** cofre de secrets da plataforma; nada de token em arquivo versionado.

@@ -26,7 +26,7 @@ const verificacoes = [
     executar: async () => {
       const naoPreenchido = String(config.verdade.fonte).startsWith('<');
       return {
-        gravidade: naoPreenchido ? 'atencao' : 'ok',
+        gravidade: naoPreenchido ? 'critico' : 'ok',
         numero: naoPreenchido ? 0 : 1,
         detalhe: naoPreenchido
           ? 'config.verdade.fonte ainda é um placeholder — nenhum número deste sistema decide nada'
@@ -46,6 +46,89 @@ const verificacoes = [
         detalhe: `${regras} exportações da doutrina, ${testes.length} testes`,
         acao: testes.length >= regras ? 'nenhuma' : 'escrever o teste da regra que entrou sem caso real',
       };
+    },
+  },
+  {
+    nome: 'regras_que_decidem_tem_teste',
+    executar: async () => {
+      const { REGRAS_QUE_DECIDEM } = require('../src/regras');
+      const testes = (await fs.readFile(path.join(RAIZ, 'test/decisao.test.js'), 'utf8')).match(/\btest\(/g) || [];
+      const ok = testes.length >= REGRAS_QUE_DECIDEM.length;
+      return {
+        gravidade: ok ? 'ok' : 'critico',
+        numero: REGRAS_QUE_DECIDEM.length,
+        detalhe: `${REGRAS_QUE_DECIDEM.length} regras decidem sozinhas, ${testes.length} testes de decisão`,
+        acao: ok ? 'nenhuma' : 'toda regra que decide precisa de um teste com o caso real',
+      };
+    },
+  },
+  {
+    nome: 'fusos_das_duas_pontas',
+    executar: async () => {
+      const { conferirFusos } = require('../src/tempo');
+      return conferirFusos({
+        fusoDaVerdade: config.tempo.fusoDaVerdade,
+        fusoDaConta: config.tempo.fusoDaContaDeAnuncio,
+        conta: 'padrão',
+      });
+    },
+  },
+  {
+    nome: 'gasto_conferido_com_o_gerenciador',
+    executar: async () => {
+      // A única conferência que este repositório NÃO consegue fazer sozinho:
+      // ela exige abrir o Gerenciador de Anúncios e comparar com o olho.
+      // Enquanto não houver registro, nenhum número daqui foi conferido contra
+      // o dado bruto — e a regra 16 diz que ele não vira proposta.
+      const destino = path.join(RAIZ, '.conferencias/gerenciador.json');
+      let registro;
+      try {
+        registro = JSON.parse(await fs.readFile(destino, 'utf8'));
+      } catch {
+        return {
+          gravidade: 'critico',
+          numero: 0,
+          detalhe: 'nenhuma conferência registrada contra o Gerenciador de Anúncios',
+          acao: 'conferir o gasto de ontem de 3 campanhas e gravar em .conferencias/gerenciador.json',
+        };
+      }
+      const linhas = Array.isArray(registro.campanhas) ? registro.campanhas : [];
+      const divergentes = linhas.filter((l) => Math.abs(l.gasto_sistema - l.gasto_painel) > 0.01);
+      return {
+        gravidade: linhas.length >= 3 && divergentes.length === 0 ? 'ok' : 'critico',
+        numero: linhas.length,
+        detalhe: `${linhas.length} campanhas conferidas, ${divergentes.length} divergindo acima de R$ 0,01`,
+        acao:
+          linhas.length < 3
+            ? 'conferir pelo menos 3 campanhas'
+            : divergentes.length > 0
+              ? `resolver a divergência de ${divergentes.map((d) => d.campanha_id).join(', ')} — nunca arredondar`
+              : 'nenhuma',
+      };
+    },
+  },
+  {
+    nome: 'order_bump_conferido',
+    executar: async () => {
+      // Também não dá para fazer daqui: exige uma compra de teste real.
+      const destino = path.join(RAIZ, '.conferencias/order-bump.json');
+      try {
+        const r = JSON.parse(await fs.readFile(destino, 'utf8'));
+        const ok = r.vendas_contadas === 1 && r.itens_no_checkout >= 2;
+        return {
+          gravidade: ok ? 'ok' : 'critico',
+          numero: r.vendas_contadas,
+          detalhe: `compra de teste com ${r.itens_no_checkout} itens contou ${r.vendas_contadas} venda(s)`,
+          acao: ok ? 'nenhuma' : 'a chave de contagem não é o checkout — ver ARMADILHAS.md',
+        };
+      } catch {
+        return {
+          gravidade: 'critico',
+          numero: 0,
+          detalhe: 'nenhuma compra de teste com order bump registrada',
+          acao: 'fazer uma compra de teste com bump e gravar em .conferencias/order-bump.json',
+        };
+      }
     },
   },
   {

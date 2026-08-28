@@ -94,3 +94,25 @@ module.exports = {
   exigirMesmaJanela,
   classificarJanela,
 };
+
+/**
+ * O gasto da Meta vem no fuso da CONTA; a venda vem no fuso de quem EMITE.
+ * Quando os dois diferem, a receita fica adiantada em relação ao gasto — e a
+ * divisão de um pelo outro deixa de ser custo por venda.
+ *
+ * EPISÓDIO: a diferença era de três horas e ninguém via, porque as duas
+ * colunas continuavam plausíveis.
+ */
+function conferirFusos({ fusoDaVerdade, fusoDaConta, conta = 'conta' }) {
+  if (fusoDaVerdade === fusoDaConta) {
+    return { gravidade: 'ok', numero: 0, detalhe: `${conta}: mesmo fuso nas duas pontas`, acao: 'nenhuma' };
+  }
+  return {
+    gravidade: 'critico',
+    numero: 1,
+    detalhe: `${conta}: venda em ${fusoDaVerdade} e gasto em ${fusoDaConta} — janelas diferentes`,
+    acao: 'reagregar o gasto por hora no fuso da verdade, ou declarar a divergência e não dividir',
+  };
+}
+
+module.exports.conferirFusos = conferirFusos;
