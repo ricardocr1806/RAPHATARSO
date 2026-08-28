@@ -1,0 +1,34 @@
+{
+  "_comentario": "Limiares moram aqui, fora da lógica. Regra muda de valor sem virar commit de código; regra muda de FORMA vira commit em src/doutrina.js.",
+  "fuso": "America/Sao_Paulo",
+  "verdade": {
+    "fonte": "<PREENCHER NA FASE 01: onde o resultado realmente aparece>",
+    "painelInformativo": "<PREENCHER: o painel que NÃO decide>",
+    "inflacaoEsperadaDoPainel": { "min": 1.6, "max": 3.5 },
+    "divergenciaToleravel": 0.05
+  },
+  "corte": {
+    "diasMinimosSemResultado": 14,
+    "gastoMinimoSemResultado": 0
+  },
+  "promocao": {
+    "resultadosMinimos": 3,
+    "diasMinimos": 3
+  },
+  "propostas": {
+    "expiraEmDias": 7,
+    "gatilhosComExecucaoAutomatica": []
+  },
+  "readback": {
+    "tentativas": 2,
+    "esperaEntreTentativasMs": 3000
+  },
+  "lote": {
+    "parametrosPorBloco": 90,
+    "tetoDeChamadasPorInvocacao": 1000,
+    "margemDeSeguranca": 0.9
+  },
+  "janelaParcial": {
+    "fracaoPendenteNoDiaCorrente": 0.42
+  }
+}

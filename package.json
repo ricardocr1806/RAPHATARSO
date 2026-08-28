@@ -1,0 +1,11 @@
+{
+  "name": "raphatarso",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Esqueleto para pôr um agente a operar em produção sem perder a confiança de quem opera. Domínio ainda não ancorado (Fase 01).",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "auditoria": "node scripts/auditoria.js"
+  },
+  "engines": { "node": ">=20" }
+}
