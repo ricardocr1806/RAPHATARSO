@@ -84,6 +84,29 @@ Commit sem deploy é uma mentira com data.
 - 0 gatilhos com execução automática — a lista está vazia de propósito.
 - 40 armadilhas com preço; 15 delas com mutação que prova a trava.
 
+## Achados na operação que está no ar (30/08/2026, conta CA3)
+
+Conferido contra a Graph API e contra os bancos D1 `gestor`/`quiz-eventos`/`rastreio`.
+
+- **A CA3 está fora da carga de gasto.** `gestor.spend` tem 4 contas
+  (847496517696558, 1245780739476126, 477342425120581, 376068447040830). A
+  `act_894212022756623` (CA3 - TARSO - PERPÉTUO) não está lá e gastou
+  **R$ 32.770,29** nos 30 dias fechados, mais R$ 527,56 hoje. As 223 vendas
+  pagas dela ENTRAM no banco; o custo não. Nenhum CPA da CA3 é calculável pelo
+  sistema hoje.
+- **Os quizzes da CA3 não gravam evento nenhum.** `quiz-eventos` só conhece
+  `feridas` e `mapa-da-alma`; `bandit_arms` também. Os sete destinos da CA3
+  (bloqueio, bloqueios2, lpdmm, desafio2, quizmentem, desafio, quizz) não estão
+  em nenhum dos dois — não há funil tela a tela para essa conta.
+- **Divergência aberta:** cinco quizzes da CA3 gastaram R$ 10.044,71 na janela
+  fechada com 123 compras segundo a Meta e **zero** venda no registro pago.
+  Nenhuma venda em toda a base carrega UTM de `DMM`, `Desafio` ou `Mente` —
+  então não é falha de resolução de ids: o checkout desses funis não chega ao
+  webhook. Não resolvida; depende de o dono dizer onde esse checkout vive.
+- **Inflação da Meta na CA3:** 459 compras contra 221 vendas pagas = **2,08x**,
+  dentro da faixa de 1,59x a 3,5x que a doutrina prevê.
+- A conta está em `account_status=9` (período de carência).
+
 ## Próximo passo
 
 O passo 1 do briefing, com credencial de verdade: carga horária de gasto,
