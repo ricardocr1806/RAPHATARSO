@@ -277,3 +277,15 @@ parágrafo.
 **Sintoma:** nenhum, até vazar.
 **Causa:** conveniência.
 **Trava:** cofre de secrets da plataforma; nada de token em arquivo versionado.
+
+### Contador de entrada disparando no carregamento da página
+**Preço:** a queda da capa apareceu como 69,7% quando era 57,2% — 1.483 pessoas que nunca existiram no funil do Desbloqueio, e um denominador que varia com robô e prefetch em todo teste de capa.
+**Sintoma:** carregamentos 41% a 54% acima dos cliques que a Meta cobra.
+**Causa:** `entry` disparado no `PageView`, antes de qualquer pixel na tela: conta recarga, volta do navegador, prefetch e rastreador.
+**Trava:** sem trava automática — o denominador honesto é o clique pago da Meta; o código do quiz V1 (entrada só na primeira interação real) é o padrão a copiar.
+
+### O mesmo nome para dois jeitos de contar entrada
+**Preço:** levou a uma conclusão invertida — reportei que o quiz V1 tinha a melhor capa (77% de aproveitamento) quando ele tem a pior (42,1%), empatada com o Desbloqueio.
+**Sintoma:** um funil aparentemente três vezes melhor que os irmãos, sem nada no desenho que explicasse.
+**Causa:** `entries` significa "carregou a página" em três quizzes e "tocou na tela" em um. Dois estados diferentes com o mesmo nome.
+**Trava:** `src/tempo.js#exigirMesmaJanela` é o análogo para tempo; para contador, a regra é a mesma — não comparar duas séries sem provar que medem o mesmo evento.

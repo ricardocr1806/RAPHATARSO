@@ -123,11 +123,27 @@ esta), e o motor é cego para a maior parte da venda: das 421 vendas pagas,
   transações na janela). A receita acima é PISO.
 - 174 linhas sem `txn_id`, todas não pagas.
 
-**Correção de um número que reportei antes:** eu disse que a LP-DMM tinha
+**A capa: o contador de entrada infla.** `entry` dispara no `PageView` em
+`bloqueio`, `bloqueios2` e `desafio2` — antes de qualquer pixel na tela, contando
+recarga, prefetch e robô. Medido contra o clique pago da Meta, ele infla de 41%
+a 54%. Já `desafio` (V1) só conta na primeira interação real. Comparar os dois é
+comparar definições, não capas — duas coisas diferentes com o mesmo nome.
+
+Com o denominador honesto (cliques no link), quem chega e responde a primeira
+pergunta: bloqueios2 56,5% · desafio2 48,4% · bloqueio 42,8% · desafio V1 42,1%.
+A queda da capa do V2 é 51,6% (não 67,8%) e a do Desbloqueio 57,2% (não 69,7%).
+O bloqueios2 é o melhor nas duas medidas independentes: entrada e CPA.
+
+**Checkout:** `desafio`/`desafio2` usam Assiny embutido; `bloqueio`/`bloqueios2`
+usam redirect para a OnProfit. É exatamente a divisão entre os quizzes cujas
+vendas o motor NÃO vê e os que ele vê.
+
+**Correções de números que reportei antes:** eu disse que a LP-DMM tinha
 gastado R$ 7.067,10 com zero venda. A venda existe — 114, CPA R$ 61,99, o melhor
-dos cinco. O que era verdade é que o MOTOR não a vê. E a comparação anterior
+dos cinco. O que era verdade é que o MOTOR não a vê. A comparação anterior
 cruzou dia em UTC (`gestor.orders`) com dia no fuso da conta (Meta): os dois
-bancos gravam UTC, e essa era a comparação de janelas que a doutrina proíbe.
+bancos gravam UTC, e essa era a comparação de janelas que a doutrina proíbe. E a
+queda de capa que publiquei usava um contador inflado como denominador.
 
 ## Próximo passo
 
