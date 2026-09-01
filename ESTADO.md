@@ -144,6 +144,19 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
+**O dado completo do funil EXISTE — noutro servidor.** As páginas mandam todo
+evento para dois destinos. O dashboard (`dashboardquiz.raphatarso.com.br`, banco
+`dashboardquiz-db`) só grava etapa em `QuizAnswer`, por isso as 20 telas cegas.
+Mas `renderStep()` dispara `QuizStep` com `session_id`, `step_index` e
+`step_type` para TODA tela — pergunta, presente, prova, formulário, carregamento
+e resultado — e manda para `quiz-analytics.iaplx.workers.dev/track`. Lá está o
+funil por pessoa, por tela, datado, com a rota `/api/drop_off` pronta.
+
+Não consigo ler: as rotas `/api/*` respondem 401 e o worker está em OUTRA conta
+Cloudflare (`iaplx`; a nossa é `digizionpro`), fora do alcance do
+`CLOUDFLARE_API_TOKEN`. Falta a chave de leitura — é o pedido mais barato que
+existe para fechar o diagnóstico do funil.
+
 **Checkout:** `desafio`/`desafio2` usam Assiny embutido; `bloqueio`/`bloqueios2`
 usam redirect para a OnProfit. É exatamente a divisão entre os quizzes cujas
 vendas o motor NÃO vê e os que ele vê.
