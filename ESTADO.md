@@ -144,6 +144,28 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
+**Os cinco quizzes na mesma régua** (funil acumulado; dinheiro na janela
+fechada 31/07-29/08). O front da conta perde R$ 5.148,22 no período:
+
+| quiz | entra | form | clica | paga | ponta a ponta | gasto | CPA | margem |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| Bloqueios no Inconsciente | **57,2%** | **80,1%** | 27,0% | **28,5%** | **3,52%** | 5.968,46 | 67,82 | −424,76 |
+| LP Oferta Mente Milionária | 60,6% | — | — | 39,6% | — | 7.067,10 | **61,99** | **+241,20** |
+| Sessão de Desbloqueio | 42,9% | 72,0% | 26,4% | 24,9% | 2,03% | 16.757,02 | 83,79 | **−4.034,52** |
+| Desafio Mente Milionária V2 | 48,4% | 54,0% | 66,2% | **9,9%** | 1,71% | 1.473,00 | 81,83 | −502,50 |
+| Desafio Mente Milionária (V1) | 42,1% | 61,0% | 19,5% | 24,7% | 1,24% | 494,64 | 494,64 | −427,64 |
+
+**O bloqueios2 é a versão melhor do Desbloqueio, e leva 1/3 da verba.** Mesmo
+checkout (OnProfit `Du1vhEUc?off=XOSnjX`), mesmo ticket (R$ 63,00 × R$ 63,61) e
+1,74x melhor ponta a ponta. A vantagem vem quase toda da capa: 1,33x na entrada,
+1,11x no formulário, 1,02x no clique, 1,14x no pagamento.
+
+Aritmética das duas alavancas, tudo o mais constante:
+- Desbloqueio com a capa do bloqueios2 (42,9% → 57,2%): 200 → 280 vendas, CPA
+  R$ 83,79 → R$ 59,75, margem −R$ 4.034,52 → **+R$ 1.082,17**.
+- Desafio V2 pagando como o Desbloqueio (9,9% → 24,9%): 18 → 45 vendas, CPA
+  R$ 81,83 → R$ 32,50, margem −R$ 502,50 → **+R$ 970,55**.
+
 **A corrente fecha do clique pago à venda.** O formulário e a página de vendas
 não eram cegos: são medidos por eventos próprios (`lead` = formulário enviado,
 `buyclick`), que não estavam ligados à escada de `step_counts`. Acumulado:
