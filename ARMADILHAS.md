@@ -295,3 +295,15 @@ parágrafo.
 **Sintoma:** uma escada limpa, com quedas de ~1% por tela, que não explica o resultado do funil.
 **Causa:** o contador de etapa avança em `QuizAnswer`. Presente, prova, formulário, carregamento e resultado nunca disparam o evento.
 **Trava:** sem trava automática — a escada só fecha quando o número de degraus bate com o número de telas do fluxo; conferir um contra o outro antes de concluir onde está o gargalo.
+
+### Escada de funil montada só com o contador de etapa
+**Preço:** a maior perda depois da capa ficou fora do diagnóstico por dois dias — 2.089 pessoas na página de vendas do Desbloqueio (−71,2%) reportadas como "invisíveis", quando havia evento medindo. E os −20% que atribuí a uma "pergunta de compromisso" eram formulário (−12,8%) mais entrada na oferta (−8,3%), em telas diferentes.
+**Sintoma:** um funil que termina no ar, com a conclusão "daqui para frente ninguém mede".
+**Causa:** `step_counts` é só um dos contadores. `lead` e `buyclick` medem o formulário e a oferta, em tabelas separadas, e não foram ligados à escada.
+**Trava:** sem trava automática — antes de declarar uma etapa cega, listar TODOS os eventos que o servidor aceita e conferir qual tela dispara cada um.
+
+### Numeração de etapa que atravessa a fronteira da página
+**Preço:** o degrau 26 foi lido como a última pergunta do quiz quando é o primeiro bloco da PÁGINA DE VENDAS. A conclusão "a pergunta de compromisso derruba 732 pessoas" apontava para a tela errada — e a tela errada é a que seria otimizada.
+**Sintoma:** o quiz tem 25 perguntas no código e 26 degraus no banco.
+**Causa:** o mesmo contador incremental serve o quiz e a página de vendas, porque as duas disparam `QuizAnswer`.
+**Trava:** conferir o número de degraus contra o número de telas do fluxo, e localizar no código onde cada evento é disparado antes de nomear a etapa.

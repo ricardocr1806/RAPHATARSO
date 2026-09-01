@@ -144,6 +144,32 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
+**A corrente fecha do clique pago à venda.** O formulário e a página de vendas
+não eram cegos: são medidos por eventos próprios (`lead` = formulário enviado,
+`buyclick`), que não estavam ligados à escada de `step_counts`. Acumulado:
+
+| etapa | Desbloqueio | queda | Desafio V2 | queda |
+|---|--:|--:|--:|--:|
+| clique pago | 10.359 | — | 1.052 | — |
+| começou o quiz | 4.441 | −57,1% | 509 | −51,6% |
+| última pergunta | 3.664 | −17,5% | 333 | −34,6% |
+| formulário enviado | 3.196 | −12,8% | 275 | −17,4% |
+| entrou na oferta | 2.932 | −8,3% | 262 | −4,7% |
+| clicou em comprar | 843 | **−71,2%** | 182 | −26,0% |
+| venda paga | 210 | −75,1% | 18 | −90,1% |
+| **clique → venda** | **2,0%** | | **1,7%** | |
+
+A página de vendas do Desbloqueio é a segunda maior perda do funil: 2.089
+pessoas. Lead custa R$ 5,61, clique em comprar R$ 22,95 — a oferta multiplica o
+custo por quatro. Os dois quizzes têm problemas opostos: o Desbloqueio custa
+caro para arrancar o clique mas converte (24,9% de quem clica paga); o V2
+arranca o clique fácil e quase ninguém paga (9,9%).
+
+**Correção:** o degrau 26 do Desbloqueio NÃO é pergunta do quiz — é o
+micro-compromisso dentro da `renderSalesCommit()`, depois do formulário. O
+quiz tem 25 perguntas. Os −20% que atribuí a essa "pergunta" eram formulário
+(−12,8%) mais entrada na oferta (−8,3%).
+
 **O dado completo do funil EXISTE — noutro servidor.** As páginas mandam todo
 evento para dois destinos. O dashboard (`dashboardquiz.raphatarso.com.br`, banco
 `dashboardquiz-db`) só grava etapa em `QuizAnswer`, por isso as 20 telas cegas.
