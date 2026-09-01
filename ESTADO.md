@@ -134,6 +134,16 @@ pergunta: bloqueios2 56,5% · desafio2 48,4% · bloqueio 42,8% · desafio V1 42,
 A queda da capa do V2 é 51,6% (não 67,8%) e a do Desbloqueio 57,2% (não 69,7%).
 O bloqueios2 é o melhor nas duas medidas independentes: entrada e CPA.
 
+**A escada de etapas não cobre o funil.** O contador só avança em
+`QuizAnswer`: o Desafio V2 tem 54 telas e 34 degraus; o Desbloqueio, 33 telas e
+26 degraus. As telas cegas são presente, prova, formulário, carregamento e
+resultado — e é nelas que a perda mora. Reconstruído o fluxo a partir do código:
+as quedas de 21,3% (formulário, depois de 32 perguntas), 6,7%, 6,4% e 5,6%
+(pares presente+prova) não são de pergunta nenhuma; pergunta custa ~1%. Um
+quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perda.
+No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
+(843) não têm degrau algum.
+
 **Checkout:** `desafio`/`desafio2` usam Assiny embutido; `bloqueio`/`bloqueios2`
 usam redirect para a OnProfit. É exatamente a divisão entre os quizzes cujas
 vendas o motor NÃO vê e os que ele vê.

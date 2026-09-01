@@ -289,3 +289,9 @@ parágrafo.
 **Sintoma:** um funil aparentemente três vezes melhor que os irmãos, sem nada no desenho que explicasse.
 **Causa:** `entries` significa "carregou a página" em três quizzes e "tocou na tela" em um. Dois estados diferentes com o mesmo nome.
 **Trava:** `src/tempo.js#exigirMesmaJanela` é o análogo para tempo; para contador, a regra é a mesma — não comparar duas séries sem provar que medem o mesmo evento.
+
+### Funil que só conta a tela onde a pessoa responde
+**Preço:** 20 de 54 telas invisíveis no Desafio V2 e 7 de 33 no Desbloqueio — e as invisíveis são justamente onde a perda acontece: as quatro maiores quedas do V2 (21,3%, 6,7%, 6,4%, 5,6%) são todas em tela que não é pergunta. No Desbloqueio, os 71% perdidos entre a última pergunta e o clique em comprar não têm degrau nenhum.
+**Sintoma:** uma escada limpa, com quedas de ~1% por tela, que não explica o resultado do funil.
+**Causa:** o contador de etapa avança em `QuizAnswer`. Presente, prova, formulário, carregamento e resultado nunca disparam o evento.
+**Trava:** sem trava automática — a escada só fecha quando o número de degraus bate com o número de telas do fluxo; conferir um contra o outro antes de concluir onde está o gargalo.
