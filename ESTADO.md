@@ -144,6 +144,33 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
+**ACHADO CRÍTICO (04/09): a atribuição anúncio → venda da CA3 morreu em
+25/08.** Nos 9 dias fechados de 26/08 a 03/09 a conta gastou R$ 6.488,20 e fez
+102 vendas pagas; `gestor.orders` registrou **1**. As vendas seguem chegando no
+dashboard todo dia (7 a 16), e 22 de 25 e-mails de compradores recentes não
+existem no motor sob conta nenhuma. Não é a venda que parou — é o registro.
+Enquanto isso, nenhuma decisão por anúncio pode ser tomada pelo motor.
+
+Contorno em uso: atribuir por DESTINO. Cada anúncio aponta para uma página só e
+o dashboard conta venda por página. Morre no dia em que um anúncio mandar para
+dois lugares.
+
+**Estado da conta em 03/09.** Uma única campanha ativa,
+`[67-CBO][Quiz normal-Bloqueio2] 11-08`, orçamento R$ 750/dia. Nos 9 dias
+fechados: CPA R$ 63,61 contra ticket R$ 62,48 — empate (−R$ 114,90 no front).
+É melhora grande sobre o mês anterior, quando o Desbloqueio rodava a R$ 83,79.
+
+| destino | gasto 9d | vendas | CPA | ticket | margem |
+|---|--:|--:|--:|--:|--:|
+| bloqueios2 (84% da verba) | 5.479,61 | 88 | **62,27** | 62,38 | **+9,89** |
+| bloqueio | 1.008,59 | 14 | 72,04 | 63,13 | −124,79 |
+
+O motor de decisão rodado sobre os dois dias fechados propõe REDUZIR (R2D, CPA
+R$ 73,03 > teto). **Não executar:** a trava do cenário otimista não pôde rodar
+porque os quizzes 6 e 9 não gravam pendente; a variação diária vai de R$ 42,72 a
+R$ 148,69; e o CPA dos dias recentes lê 5,1% mais caro que o maduro
+(R$ 66,18 × R$ 62,96). Dois dias somam 19 vendas.
+
 **Os cinco quizzes na mesma régua** (funil acumulado; dinheiro na janela
 fechada 31/07-29/08). O front da conta perde R$ 5.148,22 no período:
 

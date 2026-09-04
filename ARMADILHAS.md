@@ -307,3 +307,15 @@ parágrafo.
 **Sintoma:** o quiz tem 25 perguntas no código e 26 degraus no banco.
 **Causa:** o mesmo contador incremental serve o quiz e a página de vendas, porque as duas disparam `QuizAnswer`.
 **Trava:** conferir o número de degraus contra o número de telas do fluxo, e localizar no código onde cada evento é disparado antes de nomear a etapa.
+
+### Atribuição que morre sem alarme
+**Preço:** 10 dias e R$ 6.488,20 de mídia sem saber qual anúncio produz. O motor registrou 1 venda das 102 que aconteceram — 99% invisíveis — e ninguém notou, porque o motor continuou recebendo venda das OUTRAS contas (199 a 253 linhas por dia).
+**Sintoma:** zero venda atribuída à conta, num período em que o dashboard registra 7 a 16 por dia.
+**Causa:** a ligação pedido → anúncio da CA3 parou em 25/08; 22 de 25 compradores recentes não existem no motor sob conta nenhuma.
+**Trava:** sem trava automática — a auditoria precisa comparar venda por conta contra uma segunda fonte e acusar queda abrupta; batimento verde do webhook geral não prova nada sobre uma conta específica.
+
+### Pendente que não é gravado desarma a trava do corte
+**Preço:** ainda não custou — foi pego antes. A regra dos dois dias fechados propôs REDUZIR uma campanha em empate (CPA R$ 63,61 × ticket R$ 62,48 no período maduro) porque o cenário otimista devolveu o mesmo número do pessimista.
+**Sintoma:** `otimista` idêntico a `atual` em toda campanha desses quizzes.
+**Causa:** os quizzes 6 e 9 só gravam venda paga; `paid=0` não existe para eles. Zero pendente foi lido como "não há pendente" em vez de "não há dado".
+**Trava:** `custoSeTodoPendentePagar` precisa distinguir pendente ZERO de pendente NÃO MEDIDO, e a regra R2D não deve propor corte quando o cenário otimista não pôde ser calculado.
