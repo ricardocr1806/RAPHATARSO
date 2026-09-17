@@ -331,3 +331,9 @@ parágrafo.
 **Sintoma:** um ranking de criativos lindo, com CPA 30% abaixo do que a conta entrega hoje.
 **Causa:** o painel da Meta cobre 100% do histórico e a venda real só existe a partir de 17/07, em 5 destinos. O ranking mistura as duas coberturas e o melhor sempre vem de onde não há como desmentir.
 **Trava:** toda tabela de criativo precisa carregar a coluna "conferível" e o fator medido do destino; sem fator, o número é do painel e não vira proposta (regra 16).
+
+### Ler a própria recomendação como se fosse a resposta do dono
+**Preço:** uma campanha inteira criada errada — 1 campanha, 3 conjuntos e 12 anúncios em ABO quando o pedido era CBO com R$ 300 na campanha. Custou R$ 0,00 porque tudo nasce pausado, e custou a confiança de quem foi conferir na conta e não encontrou o que tinha pedido.
+**Sintoma:** o dono pergunta onde está o que pediu, e o que está lá é outra coisa.
+**Causa:** a pergunta de múltipla escolha tinha "3 conjuntos ABO" como opção recomendada; o dono respondeu em texto livre "1 campanha, 3 conjuntos e 4 criativos em cada", que não diz ABO nem CBO. O agente completou a lacuna com a própria preferência em vez de usar o que o pedido original já dizia — duplicar uma campanha cujo nome começa com `[67-CBO]`.
+**Trava:** quando o pedido é DUPLICAR, o padrão é a estrutura do original, não a preferência da doutrina. Preferência do agente que contraria o pedido vira pergunta, nunca decisão silenciosa.
