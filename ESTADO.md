@@ -179,6 +179,23 @@ fechados SÃO a janela de aprendizado. Não mexer antes de 17-18/09.
 **A atribuição anúncio → venda segue morta** (2 vendas atribuídas à CA3 em 16
 dias, contra 135 no dashboard). Toda leitura por anúncio é por DESTINO.
 
+**Campanha de teste criada em 17/09 — PAUSADA, na CA3** (`act_894212022756623`).
+
+- Campanha `120250507792940459` · `[67-ABO][4 VENCEDORES CONFERIDOS][TESTE CRIATIVO] 17-09`
+- ABO (sem orçamento na campanha), OUTCOME_SALES, pixel 1130253591753543 PURCHASE,
+  otimização VALUE, atribuição 1 dia clique/visualização, BR 18-65 Advantage+ —
+  tudo copiado da campanha de origem `120249850923970459`.
+- 3 conjuntos idênticos `[Vencedores] — 01/02/03`, R$ 100/dia cada (R$ 300/dia no total).
+- 12 anúncios (4 criativos × 3 conjuntos), destino original preservado:
+  AD7→bloqueios2, AD3→bloqueios2, AD5→lpdmm, AD1→bloqueio.
+- Read-back conferido: campanha, 3 conjuntos e os 12 anúncios em `PAUSED`,
+  gasto R$ 0,00. Nenhum objeto nasceu ativo.
+
+Os 4 criativos são os únicos com venda paga CONFERIDA e volume:
+`vid:2028685591117036` (R$ 63,77 · 197 compras), `vid:4440623302864341`
+(R$ 68,25 · 62), `vid:2811585259228142` (R$ 78,29 · 71), `vid:1423943486214484`
+(R$ 78,96 · 151). Falta o dono ligar.
+
 **Varredura de 12 meses (17/09/2025 a 16/09/2026): os "vencedores" históricos
 não são conferíveis.** R$ 319.383,35 de gasto, 841 anúncios, 106 criativos com
 R$300+. Dos 20 melhores por CPA (R$ 33,27 a R$ 46,95), **nenhum** tem venda
