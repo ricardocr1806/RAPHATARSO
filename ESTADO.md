@@ -3,7 +3,7 @@
 > Reescrito ao fim de cada trabalho. Não é diário: responde "como está a
 > operação agora". O histórico mora nos commits.
 
-**Atualizado em:** 2026-08-28
+**Atualizado em:** 2026-09-16
 **Fase atual:** 02 fechada (doutrina em código). Passos 1, 2, 7, 8 e 9 do
 briefing ainda não têm serviço no ar.
 
@@ -144,32 +144,40 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
-**ACHADO CRÍTICO (04/09): a atribuição anúncio → venda da CA3 morreu em
-25/08.** Nos 9 dias fechados de 26/08 a 03/09 a conta gastou R$ 6.488,20 e fez
-102 vendas pagas; `gestor.orders` registrou **1**. As vendas seguem chegando no
-dashboard todo dia (7 a 16), e 22 de 25 e-mails de compradores recentes não
-existem no motor sob conta nenhuma. Não é a venda que parou — é o registro.
-Enquanto isso, nenhuma decisão por anúncio pode ser tomada pelo motor.
+**Estado em 15/09 (dias fechados).** Uma campanha ativa,
+`[67-CBO][Quiz normal-Bloqueio2] 11-08`, R$ 750/dia. Setembro até 15/09: gasto
+R$ 9.100,09, 135 vendas, receita R$ 8.557,20, CPA R$ 67,41 × ticket R$ 63,39 —
+margem **−R$ 542,89**. O mês tem duas metades opostas:
 
-Contorno em uso: atribuir por DESTINO. Cada anúncio aponta para uma página só e
-o dashboard conta venda por página. Morre no dia em que um anúncio mandar para
-dois lugares.
+| | 05-11/09 (antes) | 14-15/09 (depois) |
+|---|--:|--:|
+| CPA | **R$ 59,97** | R$ 108,79 |
+| custo por lead | R$ 5,14 | R$ 4,22 |
+| lead → clique | 30,0% | 25,6% |
+| clique → venda | **28,6%** | **15,2%** |
+| margem no front | **+R$ 278,60** | **−R$ 501,44** |
 
-**Estado da conta em 03/09.** Uma única campanha ativa,
-`[67-CBO][Quiz normal-Bloqueio2] 11-08`, orçamento R$ 750/dia. Nos 9 dias
-fechados: CPA R$ 63,61 contra ticket R$ 62,48 — empate (−R$ 114,90 no front).
-É melhora grande sobre o mês anterior, quando o Desbloqueio rodava a R$ 83,79.
+**A conta ficou parada em 12-13/09** (R$ 111,70 e R$ 0) e a campanha foi
+reativada em 14/09 às 09h08. A conta estava em `account_status=9` (carência) em
+30/08, hoje está ATIVA, com saldo devedor de R$ 1.877,21.
 
-| destino | gasto 9d | vendas | CPA | ticket | margem |
-|---|--:|--:|--:|--:|--:|
-| bloqueios2 (84% da verba) | 5.479,61 | 88 | **62,27** | 62,38 | **+9,89** |
-| bloqueio | 1.008,59 | 14 | 72,04 | 63,13 | −124,79 |
+O tráfego NÃO piorou: CTR subiu de 3,33% para 3,69%, CPM estável, frequência
+1,38, posicionamentos idênticos, lead 18% mais barato. A quebra é toda depois do
+clique. Descartados: checkout responde e não mudou de endereço nem de modo; a
+mistura de pagamento é a de sempre (83% PIX), então não é venda por compensar.
+Os dois destinos pioraram juntos (bloqueios2 R$ 59,75 → R$ 114,39; bloqueio
+R$ 61,51 → R$ 80,75), então não é a página.
 
-O motor de decisão rodado sobre os dois dias fechados propõe REDUZIR (R2D, CPA
-R$ 73,03 > teto). **Não executar:** a trava do cenário otimista não pôde rodar
-porque os quizzes 6 e 9 não gravam pendente; a variação diária vai de R$ 42,72 a
-R$ 148,69; e o CPA dos dias recentes lê 5,1% mais caro que o maduro
-(R$ 66,18 × R$ 62,96). Dois dias somam 19 vendas.
+**A entrega trocou de criativo sozinha:** AD7 caiu de 74,0% para 19,9% da verba
+e o AD3 subiu de 13,3% para 64,8%. Coincidência forte com o reinício, não
+conclusão — a atribuição por anúncio segue morta.
+
+**Veredito:** a regra R2D pediria REDUZIR, mas a **R09 vem antes e manda
+MANTER** — a campanha tem menos de 48h desde a reativação, e os dois dias
+fechados SÃO a janela de aprendizado. Não mexer antes de 17-18/09.
+
+**A atribuição anúncio → venda segue morta** (2 vendas atribuídas à CA3 em 16
+dias, contra 135 no dashboard). Toda leitura por anúncio é por DESTINO.
 
 **Os cinco quizzes na mesma régua** (funil acumulado; dinheiro na janela
 fechada 31/07-29/08). O front da conta perde R$ 5.148,22 no período:

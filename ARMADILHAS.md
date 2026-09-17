@@ -319,3 +319,9 @@ parágrafo.
 **Sintoma:** `otimista` idêntico a `atual` em toda campanha desses quizzes.
 **Causa:** os quizzes 6 e 9 só gravam venda paga; `paid=0` não existe para eles. Zero pendente foi lido como "não há pendente" em vez de "não há dado".
 **Trava:** `custoSeTodoPendentePagar` precisa distinguir pendente ZERO de pendente NÃO MEDIDO, e a regra R2D não deve propor corte quando o cenário otimista não pôde ser calculado.
+
+### Deixar a campanha parar e voltar
+**Preço:** R$ 501,44 de prejuízo em dois dias. A campanha rodava a CPA R$ 59,97 com margem positiva de R$ 278,60 nos sete dias anteriores; ficou parada 12-13/09, voltou em 14/09 e o CPA foi a R$ 108,79 — clique→venda caiu de 28,6% para 15,2%. O prejuízo do mês inteiro (−R$ 542,89) é praticamente o custo desse reinício.
+**Sintoma:** tráfego MELHOR que antes — CTR de 3,33% para 3,69%, lead 18% mais barato, frequência 1,38, mesmos posicionamentos — e venda pela metade.
+**Causa:** reinício do aprendizado. A entrega reembaralhou e trocou de criativo sozinha: o AD7 caiu de 74,0% para 19,9% da verba e o AD3 subiu de 13,3% para 64,8%.
+**Trava:** a regra R09 (campanha com menos de 48h é MANTER) é o que impede cortar no meio do reaprendizado — e ela precisa vir ANTES da regra dos dois dias fechados, que é como está em `src/regras.js`. A trava que falta é do outro lado: não deixar a conta parar por saldo devedor.
