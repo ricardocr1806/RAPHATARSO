@@ -179,6 +179,20 @@ fechados SÃO a janela de aprendizado. Não mexer antes de 17-18/09.
 **A atribuição anúncio → venda segue morta** (2 vendas atribuídas à CA3 em 16
 dias, contra 135 no dashboard). Toda leitura por anúncio é por DESTINO.
 
+**Varredura de 12 meses (17/09/2025 a 16/09/2026): os "vencedores" históricos
+não são conferíveis.** R$ 319.383,35 de gasto, 841 anúncios, 106 criativos com
+R$300+. Dos 20 melhores por CPA (R$ 33,27 a R$ 46,95), **nenhum** tem venda
+verificável: rodaram em `quiz`, `quizz`, `capaquizz`, `quizmentem` e
+`quizcheckout` — destinos sem quiz cadastrado em lugar nenhum — ou terminaram
+antes de 17/07, quando o dashboard passou a existir.
+
+**76% do gasto de 12 meses (R$ 219.407) foi para destino sem medição de venda.**
+Só 22% do gasto dos criativos grandes caiu em destino medível.
+
+O melhor deles, `vid:893754483319333` (desafio2, R$ 19.694,10, CPA-Meta
+R$ 40,74), gastou R$ 121,08 depois de 17/07 e fez 1 venda — CPA R$ 114,23 no
+único pedaço conferível. Amostra fina, mas aponta contra.
+
 **Os cinco quizzes na mesma régua** (funil acumulado; dinheiro na janela
 fechada 31/07-29/08). O front da conta perde R$ 5.148,22 no período:
 

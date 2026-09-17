@@ -325,3 +325,9 @@ parágrafo.
 **Sintoma:** tráfego MELHOR que antes — CTR de 3,33% para 3,69%, lead 18% mais barato, frequência 1,38, mesmos posicionamentos — e venda pela metade.
 **Causa:** reinício do aprendizado. A entrega reembaralhou e trocou de criativo sozinha: o AD7 caiu de 74,0% para 19,9% da verba e o AD3 subiu de 13,3% para 64,8%.
 **Trava:** a regra R09 (campanha com menos de 48h é MANTER) é o que impede cortar no meio do reaprendizado — e ela precisa vir ANTES da regra dos dois dias fechados, que é como está em `src/regras.js`. A trava que falta é do outro lado: não deixar a conta parar por saldo devedor.
+
+### Escolher criativo vencedor por histórico que não pode ser conferido
+**Preço:** R$ 219.407 de 12 meses (76% do gasto) foram para destinos sem nenhuma medição de venda — `quiz`, `quizz`, `capaquizz`, `quizmentem`, `quizcheckout`. Os 20 melhores criativos da conta por CPA (R$ 33,27 a R$ 46,95) são todos desse grupo ou de antes de 17/07. Montar a campanha nova com eles seria escalar um número que nunca foi conferido contra venda paga.
+**Sintoma:** um ranking de criativos lindo, com CPA 30% abaixo do que a conta entrega hoje.
+**Causa:** o painel da Meta cobre 100% do histórico e a venda real só existe a partir de 17/07, em 5 destinos. O ranking mistura as duas coberturas e o melhor sempre vem de onde não há como desmentir.
+**Trava:** toda tabela de criativo precisa carregar a coluna "conferível" e o fator medido do destino; sem fator, o número é do painel e não vira proposta (regra 16).
