@@ -144,6 +144,30 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
+**PIXEL POLUÍDO (achado de 27/09).** A operação usa DOIS pixels e eles fazem
+coisas diferentes:
+
+- `1130253591753543` — é o que os conjuntos otimizam (`promoted_object`,
+  custom_event_type PURCHASE). Em 8 dias recebeu 2.409 eventos: PageView 1.197,
+  InitiateCheckout 915, Purchase 131, AddPaymentInfo 38. Perfil de CHECKOUT, e
+  os números batem com a venda real (fator 0,82x-0,87x medido). **Está correto.**
+- `4856275891285933` — é o que as páginas `bloqueio` e `bloqueios2` inicializam
+  (`fbq('init', ...)`). Em 8 dias recebeu **208.679 eventos**, dos quais
+  **QuizAnswer 89.632 (43%)**, PageView 60.997 (29%), ViewContent 37.078 (18%),
+  QuizStart 5.008. Purchase é 0,4%. **Cada visitante gera ~25 eventos de pixel
+  antes de fazer qualquer coisa comercial.**
+
+A causa está em `track()` das páginas: toda chamada vai para o pixel — as da
+lista `fbStd` como evento PADRÃO (inclusive `ViewContent`, disparado em CADA
+tela) e todo o resto como `trackCustom` (QuizAnswer, QuizStart, QuizStep...).
+
+Correção proposta (não executada): trocar a lista por uma allowlist de sinal de
+venda — `PageView`, `Lead`, `InitiateCheckout`, `Purchase`,
+`CompleteRegistration` — e remover o `trackCustom`. Corta ~63% do volume do
+pixel (208.679 → ~76.653) sem perder nenhum sinal comercial. Exige deploy dos
+Workers `bloqueios-telas` e `bloqueio-desbloqueio`, que servem as páginas que
+carregam toda a verba — por isso aguarda OK.
+
 **Estado em 15/09 (dias fechados).** Uma campanha ativa,
 `[67-CBO][Quiz normal-Bloqueio2] 11-08`, R$ 750/dia. Setembro até 15/09: gasto
 R$ 9.100,09, 135 vendas, receita R$ 8.557,20, CPA R$ 67,41 × ticket R$ 63,39 —

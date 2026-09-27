@@ -337,3 +337,15 @@ parágrafo.
 **Sintoma:** o dono pergunta onde está o que pediu, e o que está lá é outra coisa.
 **Causa:** a pergunta de múltipla escolha tinha "3 conjuntos ABO" como opção recomendada; o dono respondeu em texto livre "1 campanha, 3 conjuntos e 4 criativos em cada", que não diz ABO nem CBO. O agente completou a lacuna com a própria preferência em vez de usar o que o pedido original já dizia — duplicar uma campanha cujo nome começa com `[67-CBO]`.
 **Trava:** quando o pedido é DUPLICAR, o padrão é a estrutura do original, não a preferência da doutrina. Preferência do agente que contraria o pedido vira pergunta, nunca decisão silenciosa.
+
+### Mandar todo evento do funil para o pixel de anúncio
+**Preço:** 208.679 eventos em 8 dias no pixel `4856275891285933`, dos quais 43% são `QuizAnswer` e 18% `ViewContent` — cada visitante gera ~25 eventos de pixel antes de qualquer ação comercial. Purchase é 0,4% do volume. Públicos de remarketing, lookalike e os sinais de aprendizado da Meta passam a ser treinados por quem respondeu pergunta, não por quem comprou.
+**Sintoma:** o Gerenciador de Eventos mostra "qualquer ação que o lead fez" e o volume do pixel não tem relação com o volume de venda.
+**Causa:** a função `track()` da página reenvia TODA chamada para o `fbq` — as da lista `fbStd` como evento padrão (incluindo `ViewContent`, disparado em cada tela do quiz) e todo o resto como `trackCustom`. O analytics interno e o pixel de anúncio compartilham a mesma porta de saída.
+**Trava:** allowlist explícita no `track()` — só `PageView`, `Lead`, `InitiateCheckout`, `Purchase` e `CompleteRegistration` chegam ao pixel; o resto vai apenas para o analytics próprio. Sem `trackCustom` de fallback.
+
+### Dois pixels na mesma operação, com papéis diferentes e sem ninguém saber qual é qual
+**Preço:** ainda não custou em mídia — o conjunto otimiza o pixel certo por sorte de configuração, não por desenho. Mas custou o diagnóstico: a leitura inicial apontou "a campanha otimiza o pixel errado", e só a comparação do PERFIL de eventos de cada pixel (checkout × páginas) desfez o engano.
+**Sintoma:** a página inicializa um pixel e o conjunto de anúncios aponta para outro.
+**Causa:** `1130253591753543` é o pixel do checkout; `4856275891285933` é o das páginas de quiz. Nenhum documento diz isso.
+**Trava:** o papel de cada pixel fica escrito no ESTADO.md; antes de trocar pixel de conjunto, conferir o PERFIL de eventos do pixel (`/{pixel}/stats?aggregation=event`), não o nome.
