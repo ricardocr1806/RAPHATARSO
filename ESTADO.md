@@ -144,7 +144,25 @@ quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perd
 No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
 (843) não têm degrau algum.
 
-**PIXEL POLUÍDO (achado de 27/09).** A operação usa DOIS pixels e eles fazem
+**PIXEL LIMPO (corrigido em 27/09).** As páginas `bloqueio` e `bloqueios2`
+mandavam toda ação do lead para o pixel `4856275891285933`: 208.679 eventos em
+8 dias, 43% `QuizAnswer` e 18% `ViewContent`, venda em 0,4%. Cada visitante
+gerava ~25 eventos de pixel antes de qualquer ação comercial.
+
+A causa era o `track()` reenviar toda chamada ao `fbq`. Trocado por allowlist
+`['PageView','Purchase']`, sem `trackCustom`. Só o ramo do `fbq` mudou: as 17
+chamadas de `track()`, o analytics interno e o dashboard (incluindo `buyclick`)
+seguem intactos.
+
+Conferido em Chromium, 6 telas percorridas: versão antiga 8 chamadas ao pixel
+(init, PageView, QuizStart, QuizAnswer ×5); versão no ar, 2 (init, PageView).
+Zero erro de JS, todas as imagens 200, checkout intacto. Versões e rollback em
+`docs/CORRECAO-PIXEL.md`.
+
+**Não tocado:** o pixel `1130253591753543` (checkout) é quem alimenta a
+otimização dos conjuntos. Nenhum conjunto otimiza o `4856`.
+
+**Como era antes da correção:** A operação usa DOIS pixels e eles fazem
 coisas diferentes:
 
 - `1130253591753543` — é o que os conjuntos otimizam (`promoted_object`,

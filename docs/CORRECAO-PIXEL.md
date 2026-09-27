@@ -1,8 +1,22 @@
 # Correção do pixel: parar de marcar ação de lead
 
 **Pedido:** que o pixel marque apenas venda no Gerenciador de Anúncios.
-**Status:** correção pronta e conferida, **não aplicada** — o deploy foi
-bloqueado na sessão do agente (classificado como *Production Deploy*).
+**Status: APLICADA em 27/09/2026**, nas duas páginas, conferida em navegador real.
+
+| worker | versão no ar | rollback |
+|---|---|---|
+| `bloqueios-telas` | `8ce06a82-561b-4bd3-aff9-660cab241fd2` | `e946ee86-409a-499e-817a-a7bfc4686a4b` |
+| `bloqueio-desbloqueio` | `9d4bbc27-e5dc-4ddb-bc75-1805d0888b3d` | `e9e5b221-ee9b-4894-96c3-e01f22e8c095` |
+
+Conferência com Chromium percorrendo 6 telas do quiz em cada página, com o `fbq`
+instrumentado para gravar tudo que a página lhe manda:
+
+```
+versão ANTIGA (reconstruída)   8 chamadas: init, PageView, QuizStart, QuizAnswer ×5
+versão NO AR  bloqueios2       2 chamadas: init, PageView
+versão NO AR  bloqueio         2 chamadas: init, PageView
+erros de JS em qualquer uma:   0
+```
 
 ## O que está errado, com número
 
