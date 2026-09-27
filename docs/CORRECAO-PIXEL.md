@@ -1,7 +1,16 @@
 # Correção do pixel: parar de marcar ação de lead
 
 **Pedido:** que o pixel marque apenas venda no Gerenciador de Anúncios.
-**Status: APLICADA em 27/09/2026**, nas duas páginas, conferida em navegador real.
+**Status: APLICADA em 27/09/2026**, em duas rodadas, conferida em navegador real.
+
+**Rodada 2 (final):** allowlist reduzida a `['Purchase']`. Como quem dispara
+`Purchase` é o checkout e não a página, as páginas passaram a mandar ZERO evento
+ao pixel — só o `fbq('init')`. Conferido em Chromium percorrendo 6 telas em cada
+página: 1 chamada (`init`), 0 eventos, 0 erros de JS.
+
+O que sobra no pixel `4856275891285933` vem todo do checkout da OnProfit:
+`InitiateCheckout`, `AddPaymentInfo` e `Purchase`. Desligar os dois primeiros é
+no painel da OnProfit — a API deles respondeu 404 nos endpoints testados.
 
 | worker | versão no ar | rollback |
 |---|---|---|

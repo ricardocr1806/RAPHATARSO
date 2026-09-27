@@ -150,12 +150,17 @@ mandavam toda ação do lead para o pixel `4856275891285933`: 208.679 eventos em
 gerava ~25 eventos de pixel antes de qualquer ação comercial.
 
 A causa era o `track()` reenviar toda chamada ao `fbq`. Trocado por allowlist
-`['PageView','Purchase']`, sem `trackCustom`. Só o ramo do `fbq` mudou: as 17
+`['Purchase']`, sem `trackCustom` — e como quem dispara `Purchase` é o checkout,
+as páginas passaram a mandar ZERO evento ao pixel. Só o ramo do `fbq` mudou: as 17
 chamadas de `track()`, o analytics interno e o dashboard (incluindo `buyclick`)
 seguem intactos.
 
 Conferido em Chromium, 6 telas percorridas: versão antiga 8 chamadas ao pixel
-(init, PageView, QuizStart, QuizAnswer ×5); versão no ar, 2 (init, PageView).
+(init, PageView, QuizStart, QuizAnswer ×5); versão no ar, 1 (só `init`).
+
+**Falta a parte do dono:** `InitiateCheckout` e `AddPaymentInfo` continuam
+chegando porque são disparados pelo checkout da OnProfit. Só se desligam no
+painel deles.
 Zero erro de JS, todas as imagens 200, checkout intacto. Versões e rollback em
 `docs/CORRECAO-PIXEL.md`.
 
