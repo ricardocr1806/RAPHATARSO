@@ -349,3 +349,15 @@ parágrafo.
 **Sintoma:** a página inicializa um pixel e o conjunto de anúncios aponta para outro.
 **Causa:** `1130253591753543` é o pixel do checkout; `4856275891285933` é o das páginas de quiz. Nenhum documento diz isso.
 **Trava:** o papel de cada pixel fica escrito no ESTADO.md; antes de trocar pixel de conjunto, conferir o PERFIL de eventos do pixel (`/{pixel}/stats?aggregation=event`), não o nome.
+
+### Confundir o que a coluna MOSTRA com o que a Meta CONTA como resultado
+**Preço:** duas rodadas de deploy em produção e uma sessão inteira de diagnóstico para um problema que não existia na configuração da conta. Os 200 conjuntos da CA3 já apontavam `promoted_object.custom_event_type = PURCHASE` no pixel `1130253591753543` — nenhum otimizava lead, clique ou engajamento. O que aparecia na tela como "está marcando qualquer ação" era a predefinição de colunas.
+**Sintoma:** o dono vê engajamento, visualização de vídeo e clique no Gerenciador e conclui que a conta está contando ação de lead como resultado.
+**Causa:** três coisas diferentes com o mesmo nome coloquial de "o que o pixel marca": (1) o evento de RESULTADO, que é `promoted_object.custom_event_type` do conjunto; (2) o que o pixel RECEBE, que é o que a página e o checkout disparam; (3) o que a TELA mostra, que é a predefinição de colunas — e a API sempre devolve ~60 `action_type` independentemente dos três.
+**Trava:** antes de tocar em página ou em conjunto, ler `promoted_object` e `optimization_goal` de TODOS os conjuntos que já gastaram e `/{pixel}/stats?aggregation=url` do pixel que eles usam. Se o evento de resultado já é PURCHASE e nenhuma página polui aquele pixel, o problema é de coluna — e coluna não tem endpoint na Marketing API, logo não é executável por agente.
+
+### Medir o efeito de um deploy em janela que é quase toda anterior ao deploy
+**Preço:** não custou mídia, mas produziu uma conclusão invertida que quase virou ação: a leitura de 7 dias do pixel `4856275891285933` mostrava 19.050 eventos vindos de `bloqueios2` e QuizAnswer 4.433 "hoje", o que levou à conclusão de que a correção não estava de pé e de que havia caminho não corrigido na página. O deploy tinha 18 minutos de idade.
+**Sintoma:** o número agregado contradiz o código que está comprovadamente servido na URL.
+**Causa:** janela de medição de 7 ou 2 dias contra uma mudança de minutos atrás. A idade do deploy não entrou na conta.
+**Trava:** ler `modified_on` do que foi publicado ANTES de escolher a janela, e comparar duas janelas de mesma duração — uma inteiramente antes, uma inteiramente depois. Agregado que cruza o instante do deploy não mede deploy nenhum.

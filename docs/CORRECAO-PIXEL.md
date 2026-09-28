@@ -128,3 +128,73 @@ Sessão de upload já testada e aceita com hash = primeiros 32 hex do SHA-256:
 5. No Gerenciador de Eventos, em algumas horas: só `PageView` e `Purchase`.
 
 Se qualquer uma falhar, rollback imediato pela versão acima.
+
+---
+
+## Read-back contra o dado da Meta (27/09/2026, 21:20 -0300)
+
+A conferência em Chromium provou que a PÁGINA não manda mais evento. Esta prova
+que a META não recebe mais — que é o que importa. Fonte:
+`/{pixel}/stats?aggregation=url`, duas janelas de mesma duração, uma inteiramente
+antes do deploy (publicado 23:40 UTC) e uma inteiramente depois:
+
+| origem | 19:40→20:40 (antes) | 20:40→21:20 (depois) |
+|---|--:|--:|
+| `bloqueios2.raphatarso.com.br` | ~80/h (19.050 em 2 dias) | **0** — saiu da lista |
+| `bloqueio.raphatarso.com.br` | ~80/h (3.895 em 2 dias) | **1** |
+| `feridas.valeriatarso.com` | 213 | 85 |
+| `pay.onprofit.com.br` | 66 | 48 |
+
+O que resta não é das nossas páginas. `feridas.valeriatarso.com` é outro site que
+compartilha o mesmo pixel e nunca foi tocado; `pay.onprofit.com.br` é o checkout.
+
+## O que este pixel NÃO é
+
+Ponto que custou diagnóstico duas vezes e por isso fica escrito: o pixel limpo
+aqui (`4856275891285933`, "Pixel - Curadas para Curar") **não é o pixel que
+produz o resultado no Gerenciador**. Nenhum conjunto da conta o usa. Limpá-lo
+serve a público, lookalike e sinal de aprendizado — não à coluna de Resultados.
+
+O pixel do resultado é `1130253591753543` ("Pixel Tarso - Perpétuo"), e nele os
+200 conjuntos da conta já mandam contar PURCHASE:
+
+| conjuntos | evento contado | otimização |
+|--:|---|---|
+| 113 | PURCHASE | OFFSITE_CONVERSIONS |
+| 87 | PURCHASE | VALUE |
+
+Ele recebe evento de duas origens só — `pay.onprofit.com.br` e
+`chatt.raphatarso.com.br` (3 em 2 dias). Nenhuma página de quiz o polui.
+`Purchase` nele em 7 dias = 107; compras reportadas pela campanha no mesmo
+período = 104. Consistente.
+
+## O que sobra, e por que não se mexe
+
+`pay.onprofit.com.br` manda `InitiateCheckout` (~90/7d) e `AddPaymentInfo`
+(~34/7d) ao pixel `1130`. Isso NÃO é o resultado — o resultado é PURCHASE. Mas
+alimenta público e aprendizado.
+
+Na OnProfit não existe controle por evento. As rotas do painel são só estas:
+
+```
+/dashboard/integrations/facebookpixel            lista dos pixels
+/dashboard/integrations/facebookpixel/{id}/edit  editar um pixel
+/dashboard/facebookpixel/offer                   ligação pixel ↔ oferta
+```
+
+Ou seja: liga ou desliga o pixel na oferta, tudo junto. **Desligar derruba o
+`Purchase` também — que é o resultado da conta inteira. Então não se desliga.**
+
+## A parte que não é executável por agente
+
+A predefinição de colunas do Gerenciador é ajuste de visualização por usuário e
+**não tem endpoint na Marketing API**. A API sempre devolve ~60 `action_type`
+(`page_engagement`, `video_view`, `initiate_checkout`…) e a interface mostra os
+que a predefinição pedir. Caminho na interface:
+
+```
+Gerenciador → Colunas: Desempenho → Personalizar colunas
+  deixar só: Valor gasto · Compras · Custo por compra
+             Valor de conversão da compra · ROAS da compra
+  → Salvar como predefinição
+```

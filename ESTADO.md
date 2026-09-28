@@ -82,31 +82,35 @@ Commit sem deploy é uma mentira com data.
 - 0 escritas na Meta feitas por este sistema.
 - 0 propostas na fila.
 - 0 gatilhos com execução automática — a lista está vazia de propósito.
-- 40 armadilhas com preço; 15 delas com mutação que prova a trava.
+- 53 armadilhas com preço; 15 delas com mutação que prova a trava.
 
-## Achados na operação que está no ar (30/08/2026, conta CA3)
+**Conta CA3 em 27/09/2026, 21:00 -0300:** **zero campanhas ativas.** Todas as 8
+estão PAUSED, incluindo a `[67-CBO][Quiz normal-Bloqueio2] 11-08` (R$ 750/dia) e
+as duas que eu criei em 17/09 — a CBO `120250507911370459` (R$ 300/dia) e a ABO
+`120250507792940459`, que foi erro meu e continua aguardando decisão de excluir.
 
-Conferido contra a Graph API e contra os bancos D1 `gestor`, `quiz-eventos` e
-`dashboardquiz-db`. Janela fechada 31/07 a 29/08.
+Últimos 7 dias fechados (20-26/09), campanha principal: gasto R$ 5.249,92,
+**104 compras**, CPA Meta **R$ 50,48**, receita Meta R$ 6.968,00, ROAS 1,33.
+Ticket R$ 63,36. **Esse CPA NÃO foi conferido contra venda paga nesta janela** —
+o fator medido para esse destino era 0,87x, o que pôria o CPA real perto de
+R$ 58; enquanto a conferência não é feita, o número da Meta não decide nada
+(regra 5).
 
-**Onde mora o dado do quiz da CA3:** `dashboardquiz-db`, não `quiz-eventos`.
-Cinco quizzes (`quizzes.id` 5 a 9) cobrem cinco dos sete destinos dos anúncios;
-`quizmentem` e `quizz` (R$ 1.010,07 na janela) não têm quiz cadastrado.
+## Achados na operação que está no ar (conta CA3)
 
-**Os números por quiz** (gasto Meta no fuso da conta; venda = TRANSAÇÃO paga,
-convertida para São Paulo):
+Conferido contra a Graph API e os bancos D1 `gestor`, `quiz-eventos` e
+`dashboardquiz-db`. **Onde mora o dado do quiz da CA3:** `dashboardquiz-db`, não
+`quiz-eventos`. Cinco quizzes (`quizzes.id` 5 a 9) cobrem cinco dos sete destinos
+dos anúncios; `quizmentem` e `quizz` (R$ 1.010,07 na janela) não têm quiz
+cadastrado.
 
-| quiz | gasto | vendas | CPA real | ticket | Meta diz |
-|---|--:|--:|--:|--:|--:|
-| Sessão de Desbloqueio | 16.757,02 | 200 | R$ 83,79 | R$ 63,61 | 238 |
-| LP Oferta — Mente Milionária | 7.067,10 | 114 | R$ 61,99 | R$ 64,11 | 90 |
-| Bloqueios no Inconsciente | 5.968,46 | 88 | R$ 67,82 | R$ 63,00 | 98 |
-| Desafio Mente Milionária V2 | 1.473,00 | 18 | R$ 81,83 | R$ 53,92 | 18 |
-| Desafio Mente Milionária | 494,64 | 1 | R$ 494,64 | R$ 67,00 | 1 |
-| **total** | **31.760,22** | **421** | **R$ 75,44** | **R$ 63,21** | **445** |
-
-Nenhum quiz tem CPA folgadamente abaixo do ticket: o front está no empate ou
-abaixo dele, e o lucro da conta depende inteiramente do backend.
+**O quanto a Meta erra, por destino** (janela 31/07-29/08; venda = TRANSAÇÃO
+paga). A Meta disse 445 no total contra 421 conferidas, mas o erro não é
+uniforme e por isso não se tira média: Desbloqueio 238 ditas × 200 reais
+(0,84x), Bloqueios 98 × 88 (0,90x), LP-DMM 90 × 114 (**1,27x**, a Meta vê
+MENOS), Desafio V2 e V1 exatos. Gasto R$ 31.760,22, CPA real R$ 75,44 contra
+ticket R$ 63,21 — nenhum quiz tem CPA folgadamente abaixo do ticket: o front
+está no empate ou abaixo, e o lucro depende inteiramente do backend.
 
 **A CA3 continua fora da carga de gasto** (`gestor.spend` cobre 4 contas, não
 esta), e o motor é cego para a maior parte da venda: das 421 vendas pagas,
@@ -131,18 +135,15 @@ comparar definições, não capas — duas coisas diferentes com o mesmo nome.
 
 Com o denominador honesto (cliques no link), quem chega e responde a primeira
 pergunta: bloqueios2 56,5% · desafio2 48,4% · bloqueio 42,8% · desafio V1 42,1%.
-A queda da capa do V2 é 51,6% (não 67,8%) e a do Desbloqueio 57,2% (não 69,7%).
 O bloqueios2 é o melhor nas duas medidas independentes: entrada e CPA.
 
 **A escada de etapas não cobre o funil.** O contador só avança em
 `QuizAnswer`: o Desafio V2 tem 54 telas e 34 degraus; o Desbloqueio, 33 telas e
-26 degraus. As telas cegas são presente, prova, formulário, carregamento e
-resultado — e é nelas que a perda mora. Reconstruído o fluxo a partir do código:
-as quedas de 21,3% (formulário, depois de 32 perguntas), 6,7%, 6,4% e 5,6%
-(pares presente+prova) não são de pergunta nenhuma; pergunta custa ~1%. Um
-quarto par (Presente 4) derruba só 0,3% — mesmo desenho, dez vezes menos perda.
-No Desbloqueio, os 71% entre a última pergunta (2.930) e o clique em comprar
-(843) não têm degrau algum.
+26 degraus. As telas cegas — presente, prova, formulário, carregamento,
+resultado — são onde a perda mora: 21,3% no formulário e 6,7%/6,4%/5,6% nos
+pares presente+prova, contra ~1% por pergunta. Um quarto par (Presente 4)
+derruba só 0,3%: mesmo desenho, dez vezes menos perda. No Desbloqueio, os 71%
+entre a última pergunta (2.930) e o clique em comprar (843) não têm degrau.
 
 **PIXEL LIMPO (corrigido em 27/09).** As páginas `bloqueio` e `bloqueios2`
 mandavam toda ação do lead para o pixel `4856275891285933`: 208.679 eventos em
@@ -158,70 +159,45 @@ seguem intactos.
 Conferido em Chromium, 6 telas percorridas: versão antiga 8 chamadas ao pixel
 (init, PageView, QuizStart, QuizAnswer ×5); versão no ar, 1 (só `init`).
 
-**Falta a parte do dono:** `InitiateCheckout` e `AddPaymentInfo` continuam
-chegando porque são disparados pelo checkout da OnProfit. Só se desligam no
-painel deles.
-Zero erro de JS, todas as imagens 200, checkout intacto. Versões e rollback em
-`docs/CORRECAO-PIXEL.md`.
+Read-back contra a própria Meta (`/{pixel}/stats?aggregation=url`), janela igual
+antes e depois do deploy: `bloqueios2` saiu da lista de origens (era ~80/h,
+19.050 em 2 dias) e `bloqueio` caiu a **1** em 40 minutos. Tabela completa,
+versões e rollback em `docs/CORRECAO-PIXEL.md`.
 
-**Não tocado:** o pixel `1130253591753543` (checkout) é quem alimenta a
-otimização dos conjuntos. Nenhum conjunto otimiza o `4856`.
+O que resta no pixel `4856275891285933` NÃO é das nossas páginas: é
+`feridas.valeriatarso.com` (outro site, mesmo pixel, nunca tocado) e o checkout
+da OnProfit, onde não há controle por evento — só ligar/desligar o pixel por
+oferta. Desligar lá derrubaria o `Purchase` junto, que é o resultado da conta —
+então NÃO se desliga.
 
-**Como era antes da correção:** A operação usa DOIS pixels e eles fazem
-coisas diferentes:
+### O Gerenciador já conta somente venda (conferido 27/09/2026)
 
-- `1130253591753543` — é o que os conjuntos otimizam (`promoted_object`,
-  custom_event_type PURCHASE). Em 8 dias recebeu 2.409 eventos: PageView 1.197,
-  InitiateCheckout 915, Purchase 131, AddPaymentInfo 38. Perfil de CHECKOUT, e
-  os números batem com a venda real (fator 0,82x-0,87x medido). **Está correto.**
-- `4856275891285933` — é o que as páginas `bloqueio` e `bloqueios2` inicializam
-  (`fbq('init', ...)`). Em 8 dias recebeu **208.679 eventos**, dos quais
-  **QuizAnswer 89.632 (43%)**, PageView 60.997 (29%), ViewContent 37.078 (18%),
-  QuizStart 5.008. Purchase é 0,4%. **Cada visitante gera ~25 eventos de pixel
-  antes de fazer qualquer coisa comercial.**
+O pedido "quero que o Gerenciador puxe pra marcar somente vendas" já está
+satisfeito na configuração da conta, e estava antes de qualquer mudança de
+página. Os **200 conjuntos** da conta apontam todos para o mesmo evento de
+resultado:
 
-A causa está em `track()` das páginas: toda chamada vai para o pixel — as da
-lista `fbStd` como evento PADRÃO (inclusive `ViewContent`, disparado em CADA
-tela) e todo o resto como `trackCustom` (QuizAnswer, QuizStart, QuizStep...).
+| conjuntos | pixel | evento contado | otimização |
+|--:|---|---|---|
+| 113 | `1130253591753543` | PURCHASE | OFFSITE_CONVERSIONS |
+| 87 | `1130253591753543` | PURCHASE | VALUE |
 
-Correção proposta (não executada): trocar a lista por uma allowlist de sinal de
-venda — `PageView`, `Lead`, `InitiateCheckout`, `Purchase`,
-`CompleteRegistration` — e remover o `trackCustom`. Corta ~63% do volume do
-pixel (208.679 → ~76.653) sem perder nenhum sinal comercial. Exige deploy dos
-Workers `bloqueios-telas` e `bloqueio-desbloqueio`, que servem as páginas que
-carregam toda a verba — por isso aguarda OK.
+Nenhum conjunto otimiza lead, clique ou engajamento. E o pixel `1130` recebe
+evento de apenas duas origens — `pay.onprofit.com.br` (466 em 2 dias) e
+`chatt.raphatarso.com.br` (3). Nenhuma página de quiz o polui.
 
-**Estado em 15/09 (dias fechados).** Uma campanha ativa,
-`[67-CBO][Quiz normal-Bloqueio2] 11-08`, R$ 750/dia. Setembro até 15/09: gasto
-R$ 9.100,09, 135 vendas, receita R$ 8.557,20, CPA R$ 67,41 × ticket R$ 63,39 —
-margem **−R$ 542,89**. O mês tem duas metades opostas:
+Confere contra o dado bruto: `Purchase` no pixel `1130` em 7 dias = **107**;
+compras reportadas pela campanha no mesmo período = **104**. Consistente.
 
-| | 05-11/09 (antes) | 14-15/09 (depois) |
-|---|--:|--:|
-| CPA | **R$ 59,97** | R$ 108,79 |
-| custo por lead | R$ 5,14 | R$ 4,22 |
-| lead → clique | 30,0% | 25,6% |
-| clique → venda | **28,6%** | **15,2%** |
-| margem no front | **+R$ 278,60** | **−R$ 501,44** |
+**O que faz aparecer engajamento, vídeo e clique na tela é a PREDEFINIÇÃO DE
+COLUNAS**, não o que a conta conta como resultado. A API sempre devolve ~60
+`action_type` (page_engagement 73.248, video_view 67.102, initiate_checkout 399…)
+e a interface mostra os que a predefinição pedir. Isso é ajuste de visualização
+por usuário: **não existe endpoint na Marketing API para predefinição de
+colunas** — só se muda na interface (Colunas → Personalizar colunas → salvar como
+predefinição). Por isso essa parte não é executável por aqui.
 
-**A conta ficou parada em 12-13/09** (R$ 111,70 e R$ 0) e a campanha foi
-reativada em 14/09 às 09h08. A conta estava em `account_status=9` (carência) em
-30/08, hoje está ATIVA, com saldo devedor de R$ 1.877,21.
-
-O tráfego NÃO piorou: CTR subiu de 3,33% para 3,69%, CPM estável, frequência
-1,38, posicionamentos idênticos, lead 18% mais barato. A quebra é toda depois do
-clique. Descartados: checkout responde e não mudou de endereço nem de modo; a
-mistura de pagamento é a de sempre (83% PIX), então não é venda por compensar.
-Os dois destinos pioraram juntos (bloqueios2 R$ 59,75 → R$ 114,39; bloqueio
-R$ 61,51 → R$ 80,75), então não é a página.
-
-**A entrega trocou de criativo sozinha:** AD7 caiu de 74,0% para 19,9% da verba
-e o AD3 subiu de 13,3% para 64,8%. Coincidência forte com o reinício, não
-conclusão — a atribuição por anúncio segue morta.
-
-**Veredito:** a regra R2D pediria REDUZIR, mas a **R09 vem antes e manda
-MANTER** — a campanha tem menos de 48h desde a reativação, e os dois dias
-fechados SÃO a janela de aprendizado. Não mexer antes de 17-18/09.
+**Financeiro:** estava em `account_status=9` (carência) em 30/08; hoje ATIVA, com saldo devedor de R$ 1.877,21.
 
 **A atribuição anúncio → venda segue morta** (2 vendas atribuídas à CA3 em 16
 dias, contra 135 no dashboard). Toda leitura por anúncio é por DESTINO.
@@ -229,36 +205,26 @@ dias, contra 135 no dashboard). Toda leitura por anúncio é por DESTINO.
 **Campanha de teste criada em 17/09 — PAUSADA, na CA3** (`act_894212022756623`).
 
 - Campanha **`120250507911370459`** · `[67-CBO][4 VENCEDORES CONFERIDOS][TESTE CRIATIVO] 17-09`
-- **CBO, R$ 300/dia na campanha**, LOWEST_COST_WITHOUT_CAP, OUTCOME_SALES, pixel
-  1130253591753543 PURCHASE, otimização VALUE, atribuição 1 dia, BR 18-65
-  Advantage+ — copiado da campanha de origem `120249850923970459`.
-- 3 conjuntos `[Vencedores] — 01/02/03`, sem orçamento próprio (vem da campanha).
-- 12 anúncios (4 criativos × 3 conjuntos), destino original preservado:
-  AD7→bloqueios2, AD3→bloqueios2, AD5→lpdmm, AD1→bloqueio.
-- Read-back conferido: tudo em `PAUSED`, gasto R$ 0,00.
-
-Os 4 criativos são os únicos com venda paga CONFERIDA e volume:
-`vid:2028685591117036` (R$ 63,77 · 197 compras), `vid:4440623302864341`
-(R$ 68,25 · 62), `vid:2811585259228142` (R$ 78,29 · 71), `vid:1423943486214484`
-(R$ 78,96 · 151). Falta o dono ligar.
+- **CBO, R$ 300/dia na campanha**, OUTCOME_SALES, pixel 1130253591753543
+  PURCHASE, otimização VALUE, atribuição 1 dia — copiado de `120249850923970459`.
+- 3 conjuntos sem orçamento próprio; 12 anúncios (4 criativos × 3), destino
+  original preservado: AD7→bloqueios2, AD3→bloqueios2, AD5→lpdmm, AD1→bloqueio.
+- Os 4 criativos são os únicos com venda paga CONFERIDA e volume:
+  `vid:2028685591117036` (R$ 63,77 · 197 compras), `vid:4440623302864341`
+  (R$ 68,25 · 62), `vid:2811585259228142` (R$ 78,29 · 71),
+  `vid:1423943486214484` (R$ 78,96 · 151).
+- Read-back conferido: tudo em `PAUSED`, gasto R$ 0,00. Falta o dono ligar.
 
 **Pendência:** a campanha `120250507792940459` (mesma coisa em ABO) foi criada
 por engano meu antes desta e segue PAUSADA com R$ 0,00 gasto. Precisa ser
 apagada assim que o dono confirmar.
 
-**Varredura de 12 meses**Varredura de 12 meses (17/09/2025 a 16/09/2026): os "vencedores" históricos
-não são conferíveis.** R$ 319.383,35 de gasto, 841 anúncios, 106 criativos com
-R$300+. Dos 20 melhores por CPA (R$ 33,27 a R$ 46,95), **nenhum** tem venda
-verificável: rodaram em `quiz`, `quizz`, `capaquizz`, `quizmentem` e
-`quizcheckout` — destinos sem quiz cadastrado em lugar nenhum — ou terminaram
-antes de 17/07, quando o dashboard passou a existir.
-
 **76% do gasto de 12 meses (R$ 219.407) foi para destino sem medição de venda.**
-Só 22% do gasto dos criativos grandes caiu em destino medível.
-
-O melhor deles, `vid:893754483319333` (desafio2, R$ 19.694,10, CPA-Meta
-R$ 40,74), gastou R$ 121,08 depois de 17/07 e fez 1 venda — CPA R$ 114,23 no
-único pedaço conferível. Amostra fina, mas aponta contra.
+Varredura 17/09/2025 a 16/09/2026: os 20 melhores criativos da conta por CPA
+(R$ 33,27 a R$ 46,95) rodaram todos em `quiz`, `quizz`, `capaquizz`, `quizmentem`
+e `quizcheckout` — destinos sem venda medida — ou são de antes de 17/07. Montar
+campanha com eles é escalar número nunca conferido contra venda paga. Por isso a
+campanha de 17/09 usou só criativo com venda conferida.
 
 **Os cinco quizzes na mesma régua** (funil acumulado; dinheiro na janela
 fechada 31/07-29/08). O front da conta perde R$ 5.148,22 no período:
@@ -297,43 +263,36 @@ não eram cegos: são medidos por eventos próprios (`lead` = formulário enviad
 | venda paga | 210 | −75,1% | 18 | −90,1% |
 | **clique → venda** | **2,0%** | | **1,7%** | |
 
-A página de vendas do Desbloqueio é a segunda maior perda do funil: 2.089
-pessoas. Lead custa R$ 5,61, clique em comprar R$ 22,95 — a oferta multiplica o
-custo por quatro. Os dois quizzes têm problemas opostos: o Desbloqueio custa
-caro para arrancar o clique mas converte (24,9% de quem clica paga); o V2
-arranca o clique fácil e quase ninguém paga (9,9%).
+A página de vendas do Desbloqueio é a segunda maior perda: 2.089 pessoas. Lead
+R$ 5,61, clique em comprar R$ 22,95 — a oferta multiplica o custo por quatro. Os
+problemas são opostos: o Desbloqueio custa caro para arrancar o clique mas
+converte (24,9% paga); o V2 arranca o clique fácil e quase ninguém paga (9,9%).
 
-**Correção:** o degrau 26 do Desbloqueio NÃO é pergunta do quiz — é o
-micro-compromisso dentro da `renderSalesCommit()`, depois do formulário. O
-quiz tem 25 perguntas. Os −20% que atribuí a essa "pergunta" eram formulário
-(−12,8%) mais entrada na oferta (−8,3%).
+O degrau 26 do Desbloqueio não é pergunta: é o micro-compromisso da
+`renderSalesCommit()`, depois do formulário. O quiz tem 25 perguntas.
 
-**O dado completo do funil EXISTE — noutro servidor.** As páginas mandam todo
-evento para dois destinos. O dashboard (`dashboardquiz.raphatarso.com.br`, banco
-`dashboardquiz-db`) só grava etapa em `QuizAnswer`, por isso as 20 telas cegas.
-Mas `renderStep()` dispara `QuizStep` com `session_id`, `step_index` e
-`step_type` para TODA tela — pergunta, presente, prova, formulário, carregamento
-e resultado — e manda para `quiz-analytics.iaplx.workers.dev/track`. Lá está o
-funil por pessoa, por tela, datado, com a rota `/api/drop_off` pronta.
-
-Não consigo ler: as rotas `/api/*` respondem 401 e o worker está em OUTRA conta
-Cloudflare (`iaplx`; a nossa é `digizionpro`), fora do alcance do
-`CLOUDFLARE_API_TOKEN`. Falta a chave de leitura — é o pedido mais barato que
-existe para fechar o diagnóstico do funil.
+**O funil completo EXISTE — noutro servidor, e falta a chave.** `renderStep()`
+dispara `QuizStep` (`session_id`, `step_index`, `step_type`) para TODA tela e
+manda a `quiz-analytics.iaplx.workers.dev/track`, que tem `/api/drop_off` pronta.
+As rotas `/api/*` respondem 401 e o worker está na conta Cloudflare `iaplx` (a
+nossa é `digizionpro`), fora do `CLOUDFLARE_API_TOKEN`. É o pedido mais barato
+que existe para fechar o diagnóstico do funil.
 
 **Checkout:** `desafio`/`desafio2` usam Assiny embutido; `bloqueio`/`bloqueios2`
 usam redirect para a OnProfit. É exatamente a divisão entre os quizzes cujas
 vendas o motor NÃO vê e os que ele vê.
 
-**Correções de números que reportei antes:** eu disse que a LP-DMM tinha
-gastado R$ 7.067,10 com zero venda. A venda existe — 114, CPA R$ 61,99, o melhor
-dos cinco. O que era verdade é que o MOTOR não a vê. A comparação anterior
-cruzou dia em UTC (`gestor.orders`) com dia no fuso da conta (Meta): os dois
-bancos gravam UTC, e essa era a comparação de janelas que a doutrina proíbe. E a
-queda de capa que publiquei usava um contador inflado como denominador.
+**LP-DMM:** 114 vendas, CPA R$ 61,99 — o melhor dos cinco destinos. O MOTOR não
+as vê; o dinheiro existe.
 
 ## Próximo passo
 
-O passo 1 do briefing, com credencial de verdade: carga horária de gasto,
-gravando `updated_at`, e a conferência ao centavo contra o Gerenciador. É o
-alicerce de todo o resto, e é o que apaga a primeira crítica da auditoria.
+Na mão do dono, nesta ordem: (1) decidir se apaga a campanha ABO
+`120250507792940459`, criada por engano; (2) ligar a CBO `120250507911370459` —
+a conta está com ZERO campanha ativa; (3) a predefinição de colunas do
+Gerenciador, que é o único lugar onde "marcar só venda" ainda não está feito e
+não tem endpoint de API.
+
+Na minha: o passo 1 do briefing com credencial de verdade — carga horária de
+gasto gravando `updated_at`, e a conferência ao centavo contra o Gerenciador. É o
+alicerce de todo o resto e apaga a primeira crítica da auditoria.
