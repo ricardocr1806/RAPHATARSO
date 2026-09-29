@@ -361,3 +361,21 @@ parágrafo.
 **Sintoma:** o número agregado contradiz o código que está comprovadamente servido na URL.
 **Causa:** janela de medição de 7 ou 2 dias contra uma mudança de minutos atrás. A idade do deploy não entrou na conta.
 **Trava:** ler `modified_on` do que foi publicado ANTES de escolher a janela, e comparar duas janelas de mesma duração — uma inteiramente antes, uma inteiramente depois. Agregado que cruza o instante do deploy não mede deploy nenhum.
+
+### Agrupar criativo pelo primeiro número que aparece no blob do anúncio
+**Preço:** 12 anúncios criados errados e apagados em seguida — dois deles eram o MESMO vídeo com nomes diferentes, num pedido que exigia 12 criativos diferentes. O ranking inteiro estava torto: agrupando pela mídia real aparecem 17 criativos com venda conferida, não 19, e entram no top 12 três vídeos que o agrupamento errado escondia (`1573552183755929`, `1390590482752659`, `1514603249670149`).
+**Sintoma:** o read-back conta menos criativos distintos do que anúncios criados.
+**Causa:** a identidade do criativo foi extraída com regex sobre `json.dumps(creative)`, pegando o primeiro `video_id` que aparecesse — que pode vir do `asset_feed_spec`, de uma `image_url` ou de outro campo, e não do vídeo que a Meta serve.
+**Trava:** identidade de criativo sai SEMPRE de `object_story_spec.video_data.video_id` ou `object_story_spec.link_data.image_hash`, nessa ordem, nunca de busca textual no objeto inteiro.
+
+### Mandar de volta para a API o objeto que ela acabou de devolver
+**Preço:** 12 criações recusadas com "Invalid parameter" e uma rodada inteira de depuração. A mensagem só aparece em `error_user_msg`; `message` diz apenas "Invalid parameter".
+**Sintoma:** leitura devolve um objeto completo, escrita do mesmo objeto é recusada.
+**Causa:** a Graph API devolve campos que não aceita de volta. `video_data` vem com `image_url` E `image_hash` e recusa os dois juntos; `degrees_of_freedom_spec` vem preenchido e não é gravável.
+**Trava:** ao copiar criativo, montar o payload com os campos que a escrita aceita — `object_story_spec` (sem `image_url` quando há `image_hash`), `asset_feed_spec`, `url_tags` — e sempre ler `error_user_msg`, nunca só `message`.
+
+### Passar valor com `&` em `curl -d`
+**Preço:** os 12 primeiros anúncios subiram com `url_tags` truncado em `utm_source=FB`. Sem `{{ad.id}}` na URL, a venda paga não volta ligada ao criativo — que é exatamente a medição que torna esta campanha conferível. O defeito passou pela criação sem erro nenhum; só o read-back pegou.
+**Sintoma:** campo de texto chega ao servidor cortado no primeiro `&`, sem erro.
+**Causa:** `curl -d "k=a&b=c"` manda dois campos, não um. A UTM da conta tem cinco parâmetros separados por `&`.
+**Trava:** todo valor que possa conter `&`, `=` ou espaço vai por `--data-urlencode`, nunca por `-d` cru. E o read-back confere a substring que importa (`{{ad.id}}`), não só se o campo existe.
