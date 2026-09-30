@@ -1,74 +1,73 @@
 {
   "_comentario": "Limiares moram aqui, fora da lógica. Regra muda de valor sem virar commit de código; regra muda de FORMA vira commit em src/doutrina.js ou src/regras.js.",
-
   "verdade": {
     "fonte": "webhook de venda PAGA da plataforma de pagamento, agrupado por id de CHECKOUT",
     "painelInformativo": "atribuição da Meta (pixel) — conta pedido GERADO, nunca decide",
-    "inflacaoEsperadaDoPainel": { "min": 1.59, "max": 3.5 },
+    "inflacaoEsperadaDoPainel": {
+      "min": 1.59,
+      "max": 3.5
+    },
     "taxaDePagamentoObservada": 0.68,
     "divergenciaToleravel": 0.05,
     "chaveDeContagem": "checkout_id",
     "denominadorDoCustoPorVenda": "somente vendas de FRONT (produto de entrada)"
   },
-
   "tempo": {
     "_comentario": "A fronteira do dia é a de quem EMITE a venda. O gasto da Meta vem no fuso da CONTA: se os dois diferirem, a divergência é declarada, nunca ignorada.",
     "fusoDaVerdade": "America/Sao_Paulo",
     "fusoDaContaDeAnuncio": "America/Sao_Paulo",
-    "fracaoPendentePorIdadeDoDia": { "0": 0.42, "1": 0.10, "2": 0.05 }
+    "fracaoPendentePorIdadeDoDia": {
+      "0": 0.42,
+      "1": 0.1,
+      "2": 0.05
+    }
   },
-
   "decisao": {
     "diasFechadosParaReduzirOuCortar": 2,
     "horasDeLearningPhase": 48,
-    "escala": { "minimo": 0.20, "maximo": 0.30, "vezesPorDiaPorCampanha": 1 },
+    "escala": {
+      "minimo": 0.2,
+      "maximo": 0.3,
+      "vezesPorDiaPorCampanha": 1
+    },
     "corteDeEmergencia": {
       "_comentario": "Única decisão que escapa da regra dos dois dias fechados: gastou o limite e não gerou venda em fonte nenhuma.",
       "multiploDoTetoSemVenda": 1.0
     }
   },
-
   "promocao": {
     "resultadosMinimos": 3,
     "diasMinimos": 3
   },
-
   "corte": {
     "diasMinimosSemResultado": 14,
     "gastoMinimoSemResultado": 0
   },
-
   "propostas": {
     "expiraEmDias": 7,
     "gatilhosComExecucaoAutomatica": []
   },
-
   "readback": {
     "tentativas": 2,
     "esperaEntreTentativasMs": 3000
   },
-
   "lote": {
     "parametrosPorBloco": 90,
     "tetoDeChamadasPorInvocacao": 1000,
     "margemDeSeguranca": 0.9
   },
-
   "janelaParcial": {
     "fracaoPendenteNoDiaCorrente": 0.42
   },
-
   "bandit": {
     "cliquesDeAquecimentoPorBraco": 50,
     "pisoDeFatia": 0.05,
-    "tetoDeFatia": 0.80
+    "tetoDeFatia": 0.8
   },
-
   "funil": {
     "minimoPorBracoParaComparar": 30,
     "confianca": 0.95
   },
-
   "contas": {
     "_comentario": "Uma entrada por conta de anúncio. Preenchido pelo dono da operação; sem isso o motor não decide nada para a conta.",
     "exemplo_act_000": {
@@ -78,5 +77,12 @@
       "fusoDaConta": "America/Sao_Paulo",
       "ativa": false
     }
+  },
+  "venda": {
+    "_comentario": "Episódio 30/09/2026: a plataforma NÃO devolve id de checkout. O order bump vem como transação separada, e a mesma transação chega duas vezes (approved e, 7 dias depois, completed). Contar linha inflava 38%; contar o bump como venda separada inflava 13%. Os 86 bumps da janela tinham todos um pedido principal do mesmo comprador em menos de 5 minutos.",
+    "segundosParaBumpColarNoCheckout": 300,
+    "tiposDeItemQueNaoSaoVenda": [
+      "order_bump"
+    ]
   }
 }

@@ -183,6 +183,90 @@ function apresentarNumero({ valor, conferidoContra, amostra }) {
   return { valor, apresentavel: true, conferidoContra, amostra: amostra ?? null };
 }
 
+/**
+ * RECONSTRUIR O CHECKOUT QUANDO A PLATAFORMA NÃO DÁ UM.
+ *
+ * Episódio 30/09/2026 — `dashboardquiz-db`, 5 quizzes, 1.193 linhas pagas:
+ * a plataforma não devolve id de checkout. Ela manda uma transação por ITEM e
+ * repete a mesma transação no ciclo de vida. Três armadilhas, todas medidas:
+ *
+ *   contar LINHA                  912 → inflação de 38% (a mesma transação
+ *                                 chega como `approved` e, 7 dias depois,
+ *                                 como `completed`, mesmo valor)
+ *   contar TRANSAÇÃO              746 → inflação de 13% (o order bump tem
+ *                                 transação própria e vira "segunda venda")
+ *   contar CHECKOUT               663 → o número certo
+ *
+ * O bump não é venda: é receita a mais dentro de uma venda que já foi contada.
+ * Os 86 bumps da janela tinham TODOS um pedido principal do mesmo comprador em
+ * menos de 5 minutos — por isso a cola é comprador + janela de tempo.
+ *
+ * Bump órfão não é contado como venda nem descartado em silêncio: sai em
+ * `achados`, porque item que não encaixa é achado (regra 8).
+ */
+function agruparEmCheckouts(linhas, {
+  janelaSegundos = config.venda.segundosParaBumpColarNoCheckout,
+  naoSaoVenda = config.venda.tiposDeItemQueNaoSaoVenda,
+} = {}) {
+  const achados = [];
+  const pagas = [];
+
+  for (const l of linhas) {
+    if (!l.transacao_id) {
+      throw new TypeError('linha sem transacao_id: sem chave não há como colapsar repetição');
+    }
+    if (l.pago !== true) continue;
+    pagas.push(l);
+  }
+
+  // 1. A MESMA transação repetida é uma só. Vale a primeira aparição; o valor
+  //    NÃO soma, senão o eco de 7 dias dobraria a receita.
+  const porTransacao = new Map();
+  for (const l of pagas) {
+    const anterior = porTransacao.get(l.transacao_id);
+    if (!anterior || String(l.em) < String(anterior.em)) porTransacao.set(l.transacao_id, l);
+  }
+
+  const principais = [];
+  const bumps = [];
+  for (const l of porTransacao.values()) {
+    (naoSaoVenda.includes(l.tipo_item) ? bumps : principais).push(l);
+  }
+
+  const checkouts = principais
+    .map((p) => ({
+      checkout_id: p.transacao_id,
+      comprador: p.comprador ?? null,
+      em: p.em,
+      valor: Number(p.valor) || 0,
+      itens: 1,
+    }))
+    .sort((a, b) => String(a.em).localeCompare(String(b.em)));
+
+  // 2. Cada bump entra no checkout do MESMO comprador mais próximo no tempo,
+  //    dentro da janela. Soma receita, não soma venda.
+  for (const b of bumps) {
+    let alvo = null;
+    let menorDistancia = Infinity;
+    for (const c of checkouts) {
+      if (c.comprador == null || c.comprador !== b.comprador) continue;
+      const d = Math.abs(new Date(b.em).getTime() - new Date(c.em).getTime()) / 1000;
+      if (d <= janelaSegundos && d < menorDistancia) {
+        menorDistancia = d;
+        alvo = c;
+      }
+    }
+    if (!alvo) {
+      achados.push({ tipo: 'bump_sem_checkout', transacao_id: b.transacao_id, comprador: b.comprador ?? null, em: b.em });
+      continue;
+    }
+    alvo.valor += Number(b.valor) || 0;
+    alvo.itens += 1;
+  }
+
+  return { checkouts, achados };
+}
+
 /*
  * ─────────────────────────────────────────────────────────────────────────
  * REGRAS DO SEU DOMÍNIO
@@ -202,4 +286,5 @@ module.exports = {
   avaliarProposta,
   podeExecutarSemOK,
   apresentarNumero,
+  agruparEmCheckouts,
 };

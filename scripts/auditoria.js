@@ -110,7 +110,7 @@ const verificacoes = [
   {
     nome: 'order_bump_conferido',
     executar: async () => {
-      // Também não dá para fazer daqui: exige uma compra de teste real.
+      // Exige conferência contra venda REAL — compra de teste ou produção.
       const destino = path.join(RAIZ, '.conferencias/order-bump.json');
       try {
         const r = JSON.parse(await fs.readFile(destino, 'utf8'));
@@ -118,7 +118,7 @@ const verificacoes = [
         return {
           gravidade: ok ? 'ok' : 'critico',
           numero: r.vendas_contadas,
-          detalhe: `compra de teste com ${r.itens_no_checkout} itens contou ${r.vendas_contadas} venda(s)`,
+          detalhe: `checkout com ${r.itens_no_checkout} itens contou ${r.vendas_contadas} venda(s) — ${r.metodo ?? 'origem não declarada'}`,
           acao: ok ? 'nenhuma' : 'a chave de contagem não é o checkout — ver ARMADILHAS.md',
         };
       } catch {

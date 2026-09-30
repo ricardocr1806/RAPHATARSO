@@ -52,6 +52,15 @@ const MUTACOES = [
   ['blocos acima do teto do D1', 'src/lote.js',
     'function emBlocos(itens, tamanho = config.lote.parametrosPorBloco) {',
     'function emBlocos(itens, tamanho = 200) {'],
+  ['contar linha em vez de checkout (eco de 7 dias vira venda)', 'src/doutrina.js',
+    '    if (!anterior || String(l.em) < String(anterior.em)) porTransacao.set(l.transacao_id, l);',
+    '    porTransacao.set(l.transacao_id + String(l.em), l);'],
+  ['order bump contado como segunda venda', 'src/doutrina.js',
+    '    (naoSaoVenda.includes(l.tipo_item) ? bumps : principais).push(l);',
+    '    principais.push(l);'],
+  ['bump órfão descartado em silêncio', 'src/doutrina.js',
+    "      achados.push({ tipo: 'bump_sem_checkout', transacao_id: b.transacao_id, comprador: b.comprador ?? null, em: b.em });\n      continue;",
+    '      continue;'],
 ];
 
 function suitePassa() {

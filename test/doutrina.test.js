@@ -10,6 +10,7 @@ const {
   avaliarProposta,
   podeExecutarSemOK,
   apresentarNumero,
+  agruparEmCheckouts,
 } = require('../src/doutrina');
 
 test('divergência é resolvida pela fonte de verdade, nunca pela média', () => {
@@ -114,4 +115,70 @@ test('número não conferido sai vazio, com o motivo — nunca estimado', () => 
   const ok = apresentarNumero({ valor: 1234, conferidoContra: 'eventos_crus', amostra: 42 });
   assert.equal(ok.apresentavel, true);
   assert.equal(ok.valor, 1234);
+});
+
+// ── reconstruir o checkout quando a plataforma não dá um (episódio 30/09/2026)
+
+test('a mesma transação chegando como approved e como completed 7 dias depois é UMA venda', () => {
+  const { checkouts } = agruparEmCheckouts([
+    { transacao_id: 't1', comprador: 'ana@x.com', valor: 67, pago: true, em: '2026-08-12T18:47:50Z' },
+    { transacao_id: 't1', comprador: 'ana@x.com', valor: 67, pago: true, em: '2026-08-19T18:47:50Z' },
+  ]);
+  assert.equal(checkouts.length, 1);
+  assert.equal(checkouts[0].valor, 67);   // e NÃO 134: o eco não é dinheiro novo
+});
+
+test('order bump 40 segundos depois do pedido é receita do mesmo checkout, não segunda venda', () => {
+  const { checkouts, achados } = agruparEmCheckouts([
+    { transacao_id: 'p1', comprador: 'joabe@x.com', valor: 67, pago: true, em: '2026-07-17T10:34:45Z' },
+    { transacao_id: 'b1', comprador: 'joabe@x.com', valor: 39.9, pago: true, tipo_item: 'order_bump', em: '2026-07-17T10:35:25Z' },
+  ]);
+  assert.equal(checkouts.length, 1);
+  assert.equal(checkouts[0].itens, 2);
+  assert.equal(Math.round(checkouts[0].valor * 100) / 100, 106.9);
+  assert.deepEqual(achados, []);
+});
+
+test('bump a 6 minutos do pedido está fora da janela e vira achado, não venda', () => {
+  const { checkouts, achados } = agruparEmCheckouts([
+    { transacao_id: 'p1', comprador: 'nadia@x.com', valor: 67, pago: true, em: '2026-07-17T10:36:26Z' },
+    { transacao_id: 'b1', comprador: 'nadia@x.com', valor: 39.9, pago: true, tipo_item: 'order_bump', em: '2026-07-17T10:42:30Z' },
+  ]);
+  assert.equal(checkouts.length, 1);
+  assert.equal(checkouts[0].valor, 67);
+  assert.equal(achados.length, 1);
+  assert.equal(achados[0].tipo, 'bump_sem_checkout');
+});
+
+test('bump de outro comprador no mesmo minuto não cola no checkout alheio', () => {
+  const { checkouts, achados } = agruparEmCheckouts([
+    { transacao_id: 'p1', comprador: 'ana@x.com', valor: 67, pago: true, em: '2026-07-17T10:00:00Z' },
+    { transacao_id: 'b1', comprador: 'bruno@x.com', valor: 39.9, pago: true, tipo_item: 'order_bump', em: '2026-07-17T10:00:30Z' },
+  ]);
+  assert.equal(checkouts[0].valor, 67);
+  assert.equal(achados.length, 1);
+});
+
+test('linha não paga não vira venda nem recebe bump', () => {
+  const { checkouts } = agruparEmCheckouts([
+    { transacao_id: 'p1', comprador: 'ana@x.com', valor: 67, pago: false, em: '2026-09-20T10:00:00Z' },
+  ]);
+  assert.deepEqual(checkouts, []);
+});
+
+test('as três contagens do episódio: 4 linhas, 3 transações, 2 checkouts', () => {
+  const linhas = [
+    { transacao_id: 'p1', comprador: 'ana@x.com', valor: 67, pago: true, em: '2026-08-12T18:00:00Z' },
+    { transacao_id: 'p1', comprador: 'ana@x.com', valor: 67, pago: true, em: '2026-08-19T18:00:00Z' },
+    { transacao_id: 'b1', comprador: 'ana@x.com', valor: 39.9, pago: true, tipo_item: 'order_bump', em: '2026-08-12T18:01:00Z' },
+    { transacao_id: 'p2', comprador: 'bruno@x.com', valor: 67, pago: true, em: '2026-08-13T09:00:00Z' },
+  ];
+  const { checkouts } = agruparEmCheckouts(linhas);
+  assert.equal(linhas.length, 4);
+  assert.equal(new Set(linhas.map((l) => l.transacao_id)).size, 3);
+  assert.equal(checkouts.length, 2);
+});
+
+test('linha sem transacao_id é erro, não silêncio', () => {
+  assert.throws(() => agruparEmCheckouts([{ comprador: 'ana@x.com', valor: 67, pago: true }]), TypeError);
 });

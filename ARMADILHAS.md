@@ -379,3 +379,21 @@ parágrafo.
 **Sintoma:** campo de texto chega ao servidor cortado no primeiro `&`, sem erro.
 **Causa:** `curl -d "k=a&b=c"` manda dois campos, não um. A UTM da conta tem cinco parâmetros separados por `&`.
 **Trava:** todo valor que possa conter `&`, `=` ou espaço vai por `--data-urlencode`, nunca por `-d` cru. E o read-back confere a substring que importa (`{{ad.id}}`), não só se o campo existe.
+
+### Contar LINHA ou TRANSAÇÃO quando a venda é o CHECKOUT
+**Preço:** o contador de venda do painel ficou em 0 desde sempre, e as três formas de contar dão números diferentes nas mesmas 1.193 linhas pagas: LINHA 912 (+38%), TRANSAÇÃO 746 (+13%), CHECKOUT 663 — o certo. Quem decidisse escala por qualquer um dos dois primeiros escalaria um CPA 13% a 38% otimista.
+**Sintoma:** duas leituras da mesma tabela de vendas não fecham, e nenhuma delas é obviamente errada.
+**Causa:** a plataforma não devolve id de checkout. Manda uma transação por ITEM (o order bump tem transação própria) e repete a mesma transação no ciclo de vida (`approved` e, 7 dias depois, `completed`, mesmo valor).
+**Trava:** `agruparEmCheckouts` em `src/doutrina.js` — colapsa transação repetida pela primeira aparição (valor não soma), separa os `tipos_item` que não são venda e cola cada bump no checkout do MESMO comprador dentro de `config.venda.segundosParaBumpColarNoCheckout`. Bump órfão sai em `achados`, nunca em silêncio. Três mutações provam cada parte.
+
+### Casar substring de JSON com `LIKE '%campo%'`
+**Preço:** `raw LIKE '%order_bump%'` devolveu 664 linhas; o teste exato `instr(raw,'"item_type":"order_bump"')` devolve 86. A diferença são payloads do Assiny que trazem o campo `"order_bumps":[]` VAZIO. A primeira leitura dizia que 56% das vendas eram bump; a verdade é 7%.
+**Sintoma:** contagem por `LIKE` num JSON dá número grande demais e plausível demais para levantar suspeita.
+**Causa:** `LIKE '%order_bump%'` casa com o nome do CAMPO, não com o valor — e casa também com o plural `order_bumps`.
+**Trava:** ao filtrar JSON em SQL, casar o par `"chave":"valor"` inteiro com `instr`, nunca o nome do campo solto.
+
+### Supor que o evento duplicado é o que infla o resultado
+**Preço:** não custou dinheiro porque a medição veio antes da ação, mas teria feito desligar o lado errado da integração. O pixel REALMENTE duplica — `/{pixel}/stats?aggregation=event_source` mostra PageView 421 SERVER + 495 BROWSER, InitiateCheckout 367 + 344, AddPaymentInfo 17 + 17. Só que `Purchase` vem 106 do SERVER e ZERO do navegador: o evento que vira Resultado é justamente o único que não é duplicado.
+**Sintoma:** "o Gerenciador está duplicando o pixel" é verdade e mesmo assim não explica o número de vendas.
+**Causa:** conclusão tirada do total de eventos, sem separar por evento nem por origem.
+**Trava:** `aggregation=event_source` SEMPRE com o parâmetro `event=<Nome>` junto. Sem ele a API devolve o total de todos os eventos e a conta fecha errado por coincidência.
