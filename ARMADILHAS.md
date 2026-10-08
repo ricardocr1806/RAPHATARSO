@@ -397,3 +397,15 @@ parágrafo.
 **Sintoma:** "o Gerenciador está duplicando o pixel" é verdade e mesmo assim não explica o número de vendas.
 **Causa:** conclusão tirada do total de eventos, sem separar por evento nem por origem.
 **Trava:** `aggregation=event_source` SEMPRE com o parâmetro `event=<Nome>` junto. Sem ele a API devolve o total de todos os eventos e a conta fecha errado por coincidência.
+
+### Tomar o PEDIDO GERADO da plataforma por venda, porque ele chega como `Purchase`
+**Preço:** todo CPA lido no Gerenciador desde sempre estava 47% otimista. Em 01-07/10 a Meta reportou **75 compras × exatamente R$ 67,00 = R$ 5.025,00**; a venda paga conferida foi **51 checkouts, R$ 3.656,40**. Em 20-26/09, 105 contra 73. Quem escalou por esse número escalou em cima de pedido não pago.
+**Sintoma:** o Gerenciador "puxa venda a mais" e o ticket implícito dele é um valor redondo e sempre igual (R$ 67,00), sem nenhum bump de R$ 39,90 — porque o valor é o da OFERTA no momento da emissão, não o do carrinho pago.
+**Causa:** a integração de pixel do checkout dispara `Purchase` pela Conversions API quando o pedido é EMITIDO (o PIX é gerado), não quando é pago. Todos os eventos vêm com `event_source = SERVER`, `event_source_url = pay.onprofit.com.br` e uma única assinatura de parâmetros — então nenhuma regra de conversão personalizada consegue separar pago de não pago.
+**Trava:** a denúncia é a RAZÃO, não o valor absoluto. `venda paga conferida ÷ compra que a Meta conta` deu 0,695 (20-26/09) e 0,680 (01-07/10) — e a taxa de pagamento do PIX desta operação, já medida e registrada no ESTADO.md, é ~0,68. Quando a razão entre o painel e a verdade bate com a taxa de pagamento, o painel está contando EMISSÃO. Sempre conferir a razão contra uma taxa já conhecida antes de culpar duplicação de pixel.
+
+### Corrigir a página errada porque o pixel dela não é o que os conjuntos otimizam
+**Preço:** duas rodadas de deploy em 27/09 limpando `bloqueio` e `bloqueios2`, que inicializam o pixel `4856275891285933` — nenhum conjunto usa esse pixel. As páginas que alimentam o pixel `1130253591753543`, que TODOS os 200 conjuntos otimizam, eram `desafio2`, `desafio` e `lpdmm`, e ficaram intactas por 11 dias. Pior: a campanha montada em 29/09 aponta justamente para o `desafio2`.
+**Sintoma:** o pixel limpo melhora e o Gerenciador continua igual.
+**Causa:** `META_PIXEL_ID` foi lido numa página e assumido para todas. São dois pixels em cinco páginas.
+**Trava:** antes de corrigir página, listar `META_PIXEL_ID` de TODAS as páginas vivas e cruzar com o `promoted_object.pixel_id` dos conjuntos que gastam. Corrigir primeiro as que alimentam o pixel que decide.
