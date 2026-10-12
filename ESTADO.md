@@ -30,11 +30,11 @@ Detalhe e as seis perguntas respondidas: `docs/FASE-01-VERDADE.md`.
 
 | Peça | Arquivo |
 |---|---|
-| Tempo e fusos · doutrina portável (8 regras, com `agruparEmCheckouts`) | `src/tempo.js`, `src/doutrina.js` |
-| Vendas (checkout, front/backend, pendentes) · 16 regras como dados · motor | `src/vendas.js`, `src/regras.js`, `src/decisao.js` |
-| Graph API com degradação, read-back e rate limit | `src/meta/campos.js`, `src/meta/escrita.js` |
-| Bandit · funil (Wilson) · blocos de 90 · GLOB no lugar de LIKE | `src/bandit.js`, `src/funil.js`, `src/lote.js`, `src/sql.js` |
-| Read-back com segunda chance · auditoria que não engole exceção | `src/readback.js`, `src/auditoria.js` |
+| Tempo/fusos · doutrina portável (8 regras, com `agruparEmCheckouts`) | `src/tempo.js`, `src/doutrina.js` |
+| Vendas · 16 regras como dados · motor | `src/vendas.js`, `src/regras.js`, `src/decisao.js` |
+| Graph API: degradação, read-back, rate limit | `src/meta/campos.js`, `src/meta/escrita.js` |
+| Bandit · funil (Wilson) · blocos de 90 · GLOB | `src/bandit.js`, `src/funil.js`, `src/lote.js`, `src/sql.js` |
+| Read-back com segunda chance · auditoria | `src/readback.js`, `src/auditoria.js` |
 
 ```
 npm test      # 118 testes, sem dependências externas
@@ -127,50 +127,49 @@ EMITIDOS, e 32% deles nunca pagam. Em 01-07/10 a Meta reportou R$ 5.025,00 em
 75 compras de exatamente R$ 67,00 cada, sem nenhum bump de R$ 39,90 — valor da
 OFERTA na emissão, não do carrinho pago. A venda real foi R$ 3.656,40.
 
-Todos os 76 eventos de `Purchase` do pixel `1130253591753543` vêm com
-`event_source = SERVER`, `event_source_url = pay.onprofit.com.br` e uma
-assinatura única de parâmetros (`content_type`, `content_ids`, `currency`,
-`num_items`, `value`; match por email, external_id, fn, ln, phone). **Assinatura
-única significa que nenhuma regra de conversão personalizada separa pago de não
-pago.** Não é duplicação navegador×servidor e não é atribuição (101 das 105 eram
-clique de 1 dia).
+Todos os 76 `Purchase` vêm com `event_source = SERVER`, `event_source_url =
+pay.onprofit.com.br` e **assinatura única de parâmetros** — o que mata a saída
+fácil: nenhuma regra de conversão personalizada separa pago de não pago quando os
+dois chegam idênticos. Não é duplicação navegador×servidor nem atribuição (101
+das 105 eram clique de 1 dia).
 
 Duplicação EXISTE, só não no Resultado: em 01-07/10 PageView veio 407 navegador
 + 349 servidor, InitiateCheckout 310 + 330, e `Purchase` 0 + 76.
 
-**O caminho construído, INCOMPLETO.** Pixel dedicado **`1097102566581494`**
-("Venda Paga Conferida (motor)") criado, para ser alimentado só com checkout pago
-conferido via Conversions API: `event_id = checkout_id` (a Meta deduplica
-sozinha), valor real com bump dentro, `content_name = venda_paga_conferida`.
-Depois os conjuntos apontam para ele e o Resultado vira venda paga. Estado real:
-**11 eventos aceitos**, o resto recusado — a Meta não aceita evento com mais de
-7 dias, e o classificador de permissão deste ambiente barra mandar dado de
-cliente à Meta mesmo hasheado. O `stats` do pixel novo voltou VAZIO, e leitura
-vazia não é sucesso: **o mecanismo NÃO está provado.**
+**O caminho construído, INCOMPLETO.** Pixel **`1097102566581494`** ("Venda Paga
+Conferida (motor)") criado, para receber só checkout pago conferido via
+Conversions API: `event_id = checkout_id` (a Meta deduplica), valor real com bump
+dentro. Depois os conjuntos apontam para ele e o Resultado vira venda paga.
+Estado: **11 eventos aceitos**, o resto recusado — a Meta não aceita evento com
+mais de 7 dias, e o classificador de permissão deste ambiente barra mandar dado
+de cliente à Meta mesmo hasheado. O `stats` voltou VAZIO: **não provado.**
 
 **Não trocar o pixel dos conjuntos antes disso.** A campanha
 `[67-CBO][Quiz normal-Bloqueio2] 11-08` está ATIVA a R$ 750/dia; trocar o
 `promoted_object` zera o aprendizado dela — e um reinício já custou R$ 500 nesta
 conta (ver ARMADILHAS.md).
 
-### PÁGINAS: corrigidas as duas que faltavam (08/10/2026)
+### PÁGINAS: quais mandam evento ao pixel que decide
 
 Em 27/09 eu limpei `bloqueio` e `bloqueios2`, que usam o pixel `4856…933` —
-**que nenhum conjunto otimiza.** As páginas que alimentam o `1130…543`, o pixel
-que todos otimizam, eram `desafio2`, `desafio` e `lpdmm`, e ficaram 11 dias
-intactas. O `desafio2` é o destino da campanha de 29/09.
+**que nenhum conjunto otimiza.** As que alimentam o `1130…543`, otimizado por
+todos, eram `desafio2`, `desafio`, `lpdmm` e agora `iadmm`.
 
 | worker | versão de rollback | estado |
 |---|---|---|
-| `desafio2` | `05cd35d7-9a67-4975-8ebd-eab9e0cb1bb6` | **corrigido, sha256 idêntico** |
-| `lpdmm` | `5aaebe43-28ea-4dc3-9c9e-2905914e24a5` | **corrigido, sha256 idêntico** |
+| `desafio2` | `05cd35d7-9a67-4975-8ebd-eab9e0cb1bb6` | corrigido, sha256 idêntico |
+| `lpdmm` | `5aaebe43-28ea-4dc3-9c9e-2905914e24a5` | corrigido, sha256 idêntico |
+| `iadmm` | `4680cfb7-7261-4586-9ace-b45562ff751c` | corrigido 12/10, sha256 idêntico |
 | `chatt-tracker` (serve `desafio`) | `fb41a758-e1de-407e-9d25-4e7108b1b44a` | **não corrigido** |
 
-O `desafio` não é asset: o `chatt-tracker` é proxy de
-`mente-milionaria-embed-9zj.pages.dev` e injeta tracking com HTMLRewriter. O
-`fbStd` vem da origem, que não aparece na listagem de Pages desta conta;
-corrigir exige reescrever o proxy. Tem R$ 1.257 em 12 meses e nenhuma campanha
-apontada — ficou por último de propósito.
+O `iadmm` nasceu com o código antigo apontando para o `1130…543` — mesmo
+defeito, pego antes de rodar verba. Sem quiz cadastrado no `dashboardquiz-db`: o
+funil por etapa dele não é legível, a venda por anúncio é.
+
+O `desafio` não é asset: `chatt-tracker` é proxy de
+`mente-milionaria-embed-9zj.pages.dev` e injeta tracking com HTMLRewriter; o
+`fbStd` vem da origem, que não aparece na listagem de Pages. Tem R$ 1.257 em
+12 meses e nenhuma campanha apontada — ficou por último de propósito.
 
 ### O que os conjuntos mandam contar
 
@@ -183,13 +182,12 @@ A predefinição de COLUNAS é visualização por usuário e não tem endpoint n
 
 ### O painel marca conversão (corrigido 30/09, read-back conferido)
 
-`quizzes.purchase` estava **0 nos cinco** desde sempre — o único contador nunca
-escrito. Gravado o certo: bloqueios2 289 · desbloqueio 216 · lpdmm 117 · desafio
-23 · desafio2 18. Total **663**, receita R$ 46.884,90. A regra é
-`agruparEmCheckouts` em `src/doutrina.js` (7 testes, 3 mutações), rodada sobre as
-1.193 linhas reais: 0 bumps órfãos. As três contagens possíveis: LINHA 912,
-TRANSAÇÃO 746, CHECKOUT 663. O código do painel não está nesta conta Cloudflare,
-então não dá para ver se ele LÊ essa coluna nem para atualizá-la sozinha.
+`quizzes.purchase` estava **0 nos cinco** — o único contador nunca escrito.
+Gravado o certo: bloqueios2 289 · desbloqueio 216 · lpdmm 117 · desafio 23 ·
+desafio2 18. Total **663**. A regra é `agruparEmCheckouts` em `src/doutrina.js`
+(7 testes, 3 mutações); as três contagens possíveis sobre as mesmas linhas: LINHA
+912, TRANSAÇÃO 746, CHECKOUT 663. O código do painel não está nesta conta
+Cloudflare, então não dá para saber se ele LÊ essa coluna nem atualizá-la só.
 
 **Financeiro:** estava em `account_status=9` (carência) em 30/08; hoje ATIVA, com saldo devedor de R$ 1.877,21.
 
@@ -197,48 +195,53 @@ então não dá para ver se ele LÊ essa coluna nem para atualizá-la sozinha.
 
 O que estava morto era `gestor.orders`. A venda paga chega ao `dashboardquiz-db`
 com o anúncio no payload: `sales.raw` traz `utm_content = "<nome>|<ad_id>"`, mais
-campanha e conjunto, em **920 transações pagas de 17/07 a 27/09, 100% de
-cobertura**, 830 casando com anúncio da CA3 — Assiny e OnProfit, mesmo webhook.
-**Criativo passa a ser avaliado por VENDA PAGA conferida, não pela compra que a
-Meta reporta.** Para refazer: agrupar por CHECKOUT (`agruparEmCheckouts`), janela
-de gasto igual à da venda, `amount` em CENTAVOS. **Só existe porque a UTM carrega
-`{{ad.id}}`** — anúncio novo sem `url_tags` completo volta a ser cego.
+campanha e conjunto — **1.280 linhas pagas de 17/07 a 10/10, 924 checkouts
+conferidos**, Assiny e OnProfit no mesmo webhook. **Criativo passa a ser avaliado
+por VENDA PAGA conferida, não pela compra que a Meta reporta.** Para refazer:
+agrupar por CHECKOUT (`agruparEmCheckouts`), janela de gasto igual à da venda,
+`amount` em CENTAVOS. **Só existe porque a UTM carrega `{{ad.id}}`** — anúncio
+novo sem `url_tags` completo volta a ser cego. 48 vendas não têm `ad_id` e 5
+apontam para anúncio já apagado.
 
-Reagrupando pela mídia real, **17 criativos têm 3+ vendas pagas conferidas** na
-janela 17/07-26/09. Os 12 melhores por CPA real ficam todos abaixo do ticket de
-R$ 67,00 — de R$ 13,08 a R$ 64,24.
+**17 criativos têm 3+ vendas conferidas** na janela; 11 com CPA abaixo do ticket
+de R$ 67,00 (de R$ 14,09 a R$ 59,15).
 
-### Campanha criada em 29/09 — PAUSADA, na CA3
+### Campanhas montadas, as duas PAUSADAS e com R$ 0,00
 
-**`120250683788910459`** · `[67-CBO][12 VALIDADOS POR VENDA PAGA][Desafio2]`,
-CBO R$ 300/dia, OUTCOME_SALES, 3 conjuntos `[Validados] — 01/02/03` sem orçamento
-próprio, OFFSITE_CONVERSIONS, pixel 1130…543 PURCHASE, 1 dia de clique, BR 18-65.
-12 anúncios, **12 criativos e 12 mídias distintas**, `url_tags` completo com
-`{{ad.id}}` conferido no read-back, gasto R$ 0,00. Serpentina por CPA real deixa
-os conjuntos comparáveis (39,57 / 41,25 / 43,17). Em 30/09 alguém ativou 11 dos
-12 anúncios e renomeou para 30-09; a campanha segue PAUSED.
+**`120250872689220459`** · `[67-CBO][15 VALIDADOS POR VENDA PAGA][iaDMM] 12-10`
+— CBO R$ 300/dia, OUTCOME_SALES, 3 conjuntos `[Validados] — 01/02/03` sem
+orçamento próprio, OFFSITE_CONVERSIONS, pixel 1130…543 PURCHASE, 1 dia de clique,
+BR 18-65. **15 anúncios, 15 criativos e 15 mídias distintas**, 5 por conjunto,
+todos para `https://iadmm.raphatarso.com.br/`, `url_tags` com `{{ad.id}}`
+conferido. Serpentina por CPA deixa os conjuntos comparáveis (50,66/50,25/54,68).
 
-**Ressalva:** CPA não viaja com o criativo. Onze dos doze vêm de outro destino, e
-o desafio2 é o pior dos cinco no clique→venda (9,9% contra 24,9% do Desbloqueio).
-A campanha testa criativo validado, não o destino. A de 17/09
-(`120250507911370459`) segue PAUSADA com R$ 0,00 — foi montada com o ranking
-antigo, o da compra reportada pela Meta por destino.
+Os 15 são os melhores por CPA contra VENDA PAGA CONFERIDA (17/07-10/10,
+contando CHECKOUT: 924 conferidos, 0 órfãos). Onze abaixo do ticket de R$ 67,00
+(R$ 14,09 a R$ 59,15); os quatro últimos (R$ 73 a R$ 86) entraram por volume —
+são os cavalos da conta, 75/208/150/232 vendas. Quatro dos quinze têm só 3
+vendas: validados, mas finos. A `120250683788910459` ([Desafio2], 12 criativos)
+também segue PAUSADA.
+
+**Ressalva:** CPA não viaja com o criativo — vem amarrado ao destino onde foi
+medido, e nenhum dos quinze foi medido no `iadmm`. A campanha testa criativo, não
+destino. E o Resultado do Gerenciador segue sendo pedido EMITIDO (~1,47x) até a
+raiz ser resolvida: a leitura honesta é por `utm_content` contra `sales`. A de
+17/09 e a ABO `120250507792940459` (erro meu) seguem PAUSADAS com R$ 0,00.
 
 **Pendência:** a campanha `120250507792940459` (mesma coisa em ABO) foi criada
 por engano meu antes desta e segue PAUSADA com R$ 0,00 gasto. Precisa ser
 apagada assim que o dono confirmar.
 
 **84% do gasto de 12 meses (R$ 274.113 de R$ 324.861) foi para destino sem quiz
-cadastrado** — `quiz`, `quizz`, `capaquizz`, `quizmentem`, `quizcheckout`. Não os
-torna cegos: a venda deles cai em `sales` com `quiz_id` NULO mas COM
-`utm_content`, e 187 transações pagas da janela são desse grupo. Dá para validar
-criativo ali por anúncio; o que não dá é ler o funil por etapa.
+cadastrado** — `quiz`, `quizz`, `capaquizz`, `quizmentem`, `quizcheckout`, e
+agora `iadmm`. Não os torna cegos: a venda cai em `sales` com `quiz_id` NULO mas
+COM `utm_content`. Dá para validar criativo por anúncio; não dá para ler o funil
+por etapa.
 
-**Os cinco quizzes na mesma régua** (31/07-29/08; o front perde R$ 5.148,22).
-Por ponta a ponta × CPA × margem: Bloqueios 3,52% · R$ 67,82 · −424,76 |
-LP-DMM — · **R$ 61,99** · **+241,20** | Desbloqueio 2,03% · R$ 83,79 ·
-**−4.034,52** | Desafio V2 1,71% · R$ 81,83 · −502,50 | Desafio V1 1,24% ·
-R$ 494,64 · −427,64.
+**Os cinco quizzes na mesma régua** (31/07-29/08; front perde R$ 5.148,22), por
+ponta a ponta × CPA × margem: Bloqueios 3,52% · 67,82 · −425 | LP-DMM **61,99** ·
+**+241** | Desbloqueio 2,03% · 83,79 · **−4.035** | Desafio V2 1,71% · 81,83 ·
+−503 | V1 1,24% · 494,64 · −428.
 
 **O bloqueios2 é a versão melhor do Desbloqueio, e leva 1/3 da verba** — mesmo
 checkout e ticket, 1,74x melhor ponta a ponta, vantagem quase toda da capa.
@@ -247,16 +250,14 @@ vai a 280 vendas e margem +R$ 1.082,17; Desafio V2 pagando como o Desbloqueio
 (9,9% → 24,9%) vai a 45 vendas e +R$ 970,55.
 
 **A corrente fecha do clique pago à venda**, por eventos próprios (`lead`,
-`buyclick`). Acumulado Desbloqueio × Desafio V2: clique pago 10.359 × 1.052 →
-começou o quiz 4.441 (−57,1%) × 509 (−51,6%) → última pergunta 3.664 × 333 →
-formulário 3.196 × 275 → entrou na oferta 2.932 × 262 → **clicou em comprar 843
-(−71,2%) × 182 (−26,0%)** → venda paga 210 × 18. Clique→venda: **2,0% × 1,7%**.
-
-A página de vendas do Desbloqueio é a segunda maior perda: 2.089 pessoas. Lead
-R$ 5,61, clique em comprar R$ 22,95. Problemas opostos: o Desbloqueio custa caro
-para arrancar o clique mas converte (24,9% paga); o V2 arranca o clique fácil e
-quase ninguém paga (9,9%). O degrau 26 não é pergunta: é o micro-compromisso da
-`renderSalesCommit()` — o quiz tem 25 perguntas.
+`buyclick`). Desbloqueio × Desafio V2: clique pago 10.359 × 1.052 → começou o
+quiz 4.441 (−57,1%) × 509 (−51,6%) → última pergunta 3.664 × 333 → formulário
+3.196 × 275 → oferta 2.932 × 262 → **clicou em comprar 843 (−71,2%) × 182** →
+venda paga 210 × 18. Clique→venda **2,0% × 1,7%**. A página de vendas do
+Desbloqueio é a segunda maior perda: 2.089 pessoas; lead R$ 5,61, clique em
+comprar R$ 22,95. Problemas opostos: o Desbloqueio custa caro para arrancar o
+clique mas converte (24,9% paga); o V2 arranca fácil e quase ninguém paga (9,9%).
+O degrau 26 não é pergunta: é o micro-compromisso da `renderSalesCommit()`.
 
 **O funil completo EXISTE — noutro servidor, e falta a chave.** `renderStep()`
 dispara `QuizStep` (`session_id`, `step_index`, `step_type`) para TODA tela e
