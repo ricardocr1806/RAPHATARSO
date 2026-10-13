@@ -70,12 +70,12 @@ E **1 de atenção**: `versao_no_ar` — nenhum processo no ar declara versão.
 - 0 escritas na Meta feitas por este sistema.
 - 0 propostas na fila.
 - 0 gatilhos com execução automática — a lista está vazia de propósito.
-- 62 armadilhas com preço; 18 delas com mutação que prova a trava.
+- 63 armadilhas com preço; 18 delas com mutação que prova a trava.
 
-**Conta CA3 em 29/09/2026:** **zero campanhas ativas.** Todas PAUSED, incluindo a
-`[67-CBO][Quiz normal-Bloqueio2] 11-08` (R$ 750/dia) e as três que eu criei — a
-CBO de 17/09 `120250507911370459`, a de 29/09 `120250683788910459`, e a ABO
-`120250507792940459`, que foi erro meu e aguarda decisão de excluir.
+**Conta CA3 em 13/10/2026:** duas campanhas ativas, **R$ 1.050/dia a partir de
+14/10** — `[Quiz normal-Bloqueio2] 11-08` (R$ 750/dia, já rodando) e `[iaDMM]
+12-10` (R$ 300/dia, ligada por ordem do dono com início agendado para 14/10
+00:00 -03:00; R$ 0,00 em 13/10). Conta `status=1`, sem teto, devendo R$ 1.239,48.
 
 **Campanha principal, 20-26/09, conferida contra venda paga:** gasto
 R$ 5.249,92, 104 compras na Meta contra **79 conferidas**, CPA R$ 50,48 ditos
@@ -151,9 +151,9 @@ conta (ver ARMADILHAS.md).
 
 ### PÁGINAS: quais mandam evento ao pixel que decide
 
-Em 27/09 eu limpei `bloqueio` e `bloqueios2`, que usam o pixel `4856…933` —
-**que nenhum conjunto otimiza.** As que alimentam o `1130…543`, otimizado por
-todos, eram `desafio2`, `desafio`, `lpdmm` e agora `iadmm`.
+Em 27/09 limpei `bloqueio` e `bloqueios2`, que usam o pixel `4856…933` — **que
+nenhum conjunto otimiza.** As que alimentam o `1130…543` são `desafio2`,
+`desafio`, `lpdmm` e `iadmm`.
 
 | worker | versão de rollback | estado |
 |---|---|---|
@@ -162,9 +162,9 @@ todos, eram `desafio2`, `desafio`, `lpdmm` e agora `iadmm`.
 | `iadmm` | `4680cfb7-7261-4586-9ace-b45562ff751c` | corrigido 12/10, sha256 idêntico |
 | `chatt-tracker` (serve `desafio`) | `fb41a758-e1de-407e-9d25-4e7108b1b44a` | **não corrigido** |
 
-O `iadmm` nasceu com o código antigo apontando para o `1130…543` — mesmo
-defeito, pego antes de rodar verba. Sem quiz cadastrado no `dashboardquiz-db`: o
-funil por etapa dele não é legível, a venda por anúncio é.
+O `iadmm` nasceu com o código antigo apontando para o `1130…543`, corrigido
+antes de rodar verba. Sem quiz cadastrado: o funil por etapa não é legível, a
+venda por anúncio é.
 
 O `desafio` não é asset: `chatt-tracker` é proxy de
 `mente-milionaria-embed-9zj.pages.dev` e injeta tracking com HTMLRewriter; o
@@ -177,8 +177,6 @@ Os **200 conjuntos** apontam para o mesmo evento — 113 em OFFSITE_CONVERSIONS 
 87 em VALUE, todos PURCHASE no pixel `1130253591753543`. Nenhum otimiza lead,
 clique ou engajamento. O problema nunca foi a configuração do conjunto: é o que
 a plataforma de checkout manda para esse pixel (ver A RAIZ, acima).
-
-A predefinição de COLUNAS é visualização por usuário e não tem endpoint na API.
 
 ### O painel marca conversão (corrigido 30/09, read-back conferido)
 
@@ -209,24 +207,26 @@ de R$ 67,00 (de R$ 14,09 a R$ 59,15).
 ### Campanhas montadas, as duas PAUSADAS e com R$ 0,00
 
 **`120250872689220459`** · `[67-CBO][15 VALIDADOS POR VENDA PAGA][iaDMM] 12-10`
-— CBO R$ 300/dia, OUTCOME_SALES, 3 conjuntos `[Validados] — 01/02/03` sem
-orçamento próprio, OFFSITE_CONVERSIONS, pixel 1130…543 PURCHASE, 1 dia de clique,
-BR 18-65. **15 anúncios, 15 criativos e 15 mídias distintas**, 5 por conjunto,
-todos para `https://iadmm.raphatarso.com.br/`, `url_tags` com `{{ad.id}}`
-conferido. Serpentina por CPA deixa os conjuntos comparáveis (50,66/50,25/54,68).
+— **ATIVA desde 13/10, entregando a partir de 14/10 00:00 -03:00.** CBO
+R$ 300/dia, OUTCOME_SALES, 3 conjuntos `[Validados] — 01/02/03` sem orçamento
+próprio, OFFSITE_CONVERSIONS, pixel 1130…543 PURCHASE, 1 dia de clique, BR 18-65.
+**15 anúncios, 15 criativos e 15 mídias distintas**, 5 por conjunto, todos para
+`https://iadmm.raphatarso.com.br/`, `url_tags` com `{{ad.id}}` em 15/15.
+Serpentina por CPA (50,66/50,25/54,68). Os três conjuntos originais de 12/10
+foram APAGADOS (R$ 0,00 cada): o início deles não podia mais ser movido — ver a
+armadilha do `start_time`.
 
-Os 15 são os melhores por CPA contra VENDA PAGA CONFERIDA (17/07-10/10,
-contando CHECKOUT: 924 conferidos, 0 órfãos). Onze abaixo do ticket de R$ 67,00
-(R$ 14,09 a R$ 59,15); os quatro últimos (R$ 73 a R$ 86) entraram por volume —
-são os cavalos da conta, 75/208/150/232 vendas. Quatro dos quinze têm só 3
-vendas: validados, mas finos. A `120250683788910459` ([Desafio2], 12 criativos)
-também segue PAUSADA.
+Os 15 são os melhores por CPA contra VENDA PAGA CONFERIDA (17/07-10/10, contando
+CHECKOUT: 924 conferidos, 0 órfãos). Onze abaixo do ticket de R$ 67,00 (R$ 14,09
+a R$ 59,15); os quatro últimos (R$ 73 a R$ 86) entraram por volume —
+75/208/150/232 vendas. Quatro têm só 3 vendas: validados, mas finos. A
+`120250683788910459` ([Desafio2], 12 criativos) segue PAUSADA.
 
 **Ressalva:** CPA não viaja com o criativo — vem amarrado ao destino onde foi
-medido, e nenhum dos quinze foi medido no `iadmm`. A campanha testa criativo, não
-destino. E o Resultado do Gerenciador segue sendo pedido EMITIDO (~1,47x) até a
-raiz ser resolvida: a leitura honesta é por `utm_content` contra `sales`. A de
-17/09 e a ABO `120250507792940459` (erro meu) seguem PAUSADAS com R$ 0,00.
+medido, e nenhum dos quinze foi medido no `iadmm`. E o Resultado do Gerenciador
+segue sendo pedido EMITIDO (~1,47x) até a raiz ser resolvida: a leitura honesta é
+por `utm_content` contra `sales`, dois dias fechados depois de 14/10. A de 17/09
+e a ABO `120250507792940459` (erro meu) seguem PAUSADAS.
 
 **Pendência:** a campanha `120250507792940459` (mesma coisa em ABO) foi criada
 por engano meu antes desta e segue PAUSADA com R$ 0,00 gasto. Precisa ser

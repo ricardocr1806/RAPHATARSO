@@ -409,3 +409,9 @@ parágrafo.
 **Sintoma:** o pixel limpo melhora e o Gerenciador continua igual.
 **Causa:** `META_PIXEL_ID` foi lido numa página e assumido para todas. São dois pixels em cinco páginas.
 **Trava:** antes de corrigir página, listar `META_PIXEL_ID` de TODAS as páginas vivas e cruzar com o `promoted_object.pixel_id` dos conjuntos que gastam. Corrigir primeiro as que alimentam o pixel que decide.
+
+### Tentar agendar para amanhã um conjunto que já nasceu hoje
+**Preço:** não custou mídia por sorte de ter pausado em segundos — o read-back mostrou R$ 0,00 e zero impressão — mas a campanha ficou ATIVA no dia errado, e consertar exigiu recriar 3 conjuntos e 15 anúncios e apagar os antigos. Um minuto de desatenção a mais e teria entregado com verba no dia que o dono não pediu.
+**Sintoma:** `POST /{adset}` com `start_time` futuro responde "O horário de início não poderá ser editado se o conjunto de anúncios já tiver sido iniciado", e a sequência de ativação segue adiante como se tivesse dado certo.
+**Causa:** conjunto criado sem `start_time` recebe a data da criação. A partir daí a Meta considera que ele já começou e recusa mover o início — inclusive quando está PAUSADO e nunca entregou. O erro veio ANTES dos comandos de ativação, e eu não parei a sequência.
+**Trava:** "rodar a partir de tal dia" é decidido na CRIAÇÃO do conjunto, com `start_time` no payload, nunca por edição depois. E comando que falha no meio de uma sequência de ativação aborta a sequência — ligar verba não é passo que se executa sobre um passo anterior que falhou.
